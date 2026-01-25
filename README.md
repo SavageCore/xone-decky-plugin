@@ -1,4 +1,4 @@
-# Xone Controller Manager - Decky Plugin
+# Xone Driver Manager - Decky Plugin
 
 A [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin to install and manage Xbox wireless controller drivers ([xone](https://github.com/dlundqvist/xone) & [xpad-noone](https://github.com/forkymcforkface/xpad-noone)) on Steam Deck.
 
@@ -15,7 +15,7 @@ A [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin to in
 1. Open Quick Access Menu (⋯ button)
 2. Go to the Decky tab (plug icon)
 3. Open the Plugin Store
-4. Search for "Xone Controller Manager"
+4. Search for "Xone Driver Manager"
 5. Click Install
 
 ### Manual Installation
@@ -27,7 +27,7 @@ A [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin to in
 
 1. Open Quick Access Menu (⋯ button)
 2. Navigate to the Decky tab (plug icon)
-3. Click on "Xone Controller Manager"
+3. Click on "Xone Driver Manager"
 4. Click **Install Drivers** to install the Xbox wireless controller drivers
 5. Once installed, use the **Pairing Mode** toggle to pair new controllers
 

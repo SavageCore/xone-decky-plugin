@@ -198,7 +198,7 @@ function Content() {
 
     if (isLoading) {
         return (
-            <PanelSection title="Xone Controller Manager">
+            <PanelSection title="Xone Driver Manager">
                 <PanelSectionRow>
                     <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
                         <Spinner />
@@ -209,7 +209,7 @@ function Content() {
     }
 
     return (
-        <PanelSection title="Xone Controller Manager">
+        <PanelSection title="Xone Driver Manager">
             {/* Status Display */}
             <PanelSectionRow>
                 <div style={{
@@ -293,7 +293,7 @@ function Content() {
 }
 
 export default definePlugin(() => {
-    console.log("Xone Controller Manager plugin loaded");
+    console.log("Xone Driver Manager plugin loaded");
 
     // Listen for kernel update detection from backend
     const kernelUpdateListener = addEventListener<[oldKernel: string, newKernel: string]>(
@@ -309,12 +309,12 @@ export default definePlugin(() => {
     );
 
     return {
-        name: "Xone Controller Manager",
-        titleView: <div className={staticClasses.Title}>Xone Controller Manager</div>,
+        name: "Xone Driver Manager",
+        titleView: <div className={staticClasses.Title}>Xone Driver Manager</div>,
         content: <Content />,
         icon: <FaGamepad />,
         onDismount() {
-            console.log("Xone Controller Manager plugin unloaded");
+            console.log("Xone Driver Manager plugin unloaded");
             removeEventListener("kernel_update_detected", kernelUpdateListener);
         }
     };

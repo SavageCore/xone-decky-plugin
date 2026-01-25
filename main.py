@@ -14,23 +14,23 @@ XPAD_NOONE_VERSION = "1.0"
 REQUIRED_PACKAGES = ["curl", "wget", "git", "gcc", "cabextract", "dkms", "libisl", "libmpc", "plymouth"]
 
 class Plugin:
-    """Xone Controller Manager Decky Plugin"""
+    """Xone Driver Manager Decky Plugin"""
     
     async def _main(self):
         """Called when the plugin loads"""
         self.loop = asyncio.get_event_loop()
-        decky.logger.info("Xone Controller Manager loaded")
+        decky.logger.info("Xone Driver Manager loaded")
         
         # Check for SteamOS updates on startup
         await self._check_kernel_mismatch()
     
     async def _unload(self):
         """Called when the plugin unloads"""
-        decky.logger.info("Xone Controller Manager unloaded")
+        decky.logger.info("Xone Driver Manager unloaded")
     
     async def _uninstall(self):
         """Called when plugin is uninstalled"""
-        decky.logger.info("Xone Controller Manager uninstalled")
+        decky.logger.info("Xone Driver Manager uninstalled")
 
     # =========================================================================
     # Status Methods
