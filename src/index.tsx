@@ -198,7 +198,7 @@ function Content() {
 
     if (isLoading) {
         return (
-            <PanelSection title="Xone Driver Manager">
+            <PanelSection>
                 <PanelSectionRow>
                     <div style={{ display: "flex", justifyContent: "center", padding: "20px" }}>
                         <Spinner />
@@ -209,16 +209,16 @@ function Content() {
     }
 
     return (
-        <PanelSection title="Xone Driver Manager">
+        <PanelSection>
             {/* Status Display */}
             <PanelSectionRow>
                 <div style={{
                     padding: "10px",
-                    backgroundColor: isInstalled ? "#1a472a" : "#472a1a",
+                    backgroundColor: isInstalled ? "#5ba32b" : "#de9c28",
                     borderRadius: "8px",
                     textAlign: "center"
                 }}>
-                    <span style={{ fontWeight: "bold" }}>
+                    <span style={{ fontWeight: "bold", color: "#fff" }}>
                         {isInstalled ? "Drivers Installed" : "Drivers Not Installed"}
                     </span>
                 </div>
