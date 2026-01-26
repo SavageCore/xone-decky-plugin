@@ -8,7 +8,7 @@
         "watch": "rollup -c -w",
         "package": "pnpm run build && node scripts/package.js",
         "crop-screenshots": "node scripts/crop-screenshots.js",
-        "postversion": "node scripts/sync-version.js"
+        "version": "node scripts/sync-version.js"
     },
     "repository": {
         "type": "git",

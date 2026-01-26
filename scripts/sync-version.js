@@ -1,6 +1,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { execSync } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -20,6 +21,10 @@ try {
 
     writeFileSync(pluginJsonPath, JSON.stringify(pluginJson, null, 4) + '\n');
     console.log('Successfully updated plugin.json');
+
+    // Stage plugin.json so it's included in the version commit
+    execSync(`git add "${pluginJsonPath}"`);
+    console.log('Staged plugin.json for commit');
 } catch (error) {
     console.error('Error syncing version:', error.message);
     process.exit(1);
