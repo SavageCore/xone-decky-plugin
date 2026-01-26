@@ -1,4 +1,6 @@
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SavageCore/xone-decky-plugin/shellcheck.yml?style=for-the-badge&label=ShellCheck)
+![Black](https://img.shields.io/github/actions/workflow/status/SavageCore/xone-decky-plugin/black.yml?style=for-the-badge&label=Black)
+
  ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/SavageCore/xone-decky-plugin/total?style=for-the-badge)
 
 

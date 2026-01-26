@@ -1,0 +1,24 @@
+name: Black
+
+on:
+  push:
+    paths:
+      - '**.py'
+      - '.github/workflows/black.yml'
+  pull_request:
+    paths:
+      - '**.py'
+      - '.github/workflows/black.yml'
+  workflow_dispatch:
+
+jobs:
+  black:
+    name: Black
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check files using the black formatter
+        uses: psf/black@stable
+        with:
+          options: "--check --verbose"
+          src: "."
