@@ -1,0 +1,59 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '24'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build plugin
+        run: pnpm run build
+
+      - name: Create package
+        run: |
+          mkdir -p out/xone-driver-manager
+          
+          # Copy required files
+          cp plugin.json out/xone-driver-manager/
+          cp package.json out/xone-driver-manager/
+          cp main.py out/xone-driver-manager/
+          cp README.md out/xone-driver-manager/
+          cp LICENSE out/xone-driver-manager/
+          
+          # Copy directories
+          cp -r dist out/xone-driver-manager/
+          cp -r defaults out/xone-driver-manager/
+          
+          # Create zip
+          cd out
+          zip -r xone-driver-manager-${{ github.ref_name }}.zip xone-driver-manager
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: out/xone-driver-manager-${{ github.ref_name }}.zip
+          generate_release_notes: true
+          draft: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
