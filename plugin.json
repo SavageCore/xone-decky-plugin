@@ -5,6 +5,7 @@
         "root"
     ],
     "api_version": 1,
+    "version": "0.0.0",
     "publish": {
         "tags": [
             "controller",
@@ -13,6 +14,6 @@
             "xone"
         ],
         "description": "Modern Xbox controller driver (xone) management with legacy support (xpad-noone) for Steam Deck.",
-        "image": "https://raw.githubusercontent.com/SavageCore/xone-decky-plugin/main/assets/icon.png"
+        "image": "https://raw.githubusercontent.com/SavageCore/xone-decky-plugin/main/assets/installed.png"
     }
 }

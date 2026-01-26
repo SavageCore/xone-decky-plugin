@@ -30,28 +30,12 @@ jobs:
         run: pnpm run build
 
       - name: Create package
-        run: |
-          mkdir -p out/xone-driver-manager
-          
-          # Copy required files
-          cp plugin.json out/xone-driver-manager/
-          cp package.json out/xone-driver-manager/
-          cp main.py out/xone-driver-manager/
-          cp README.md out/xone-driver-manager/
-          cp LICENSE out/xone-driver-manager/
-          
-          # Copy directories
-          cp -r dist out/xone-driver-manager/
-          cp -r defaults out/xone-driver-manager/
-          
-          # Create zip
-          cd out
-          zip -r xone-driver-manager-${{ github.ref_name }}.zip xone-driver-manager
+        run: pnpm run package
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: out/xone-driver-manager-${{ github.ref_name }}.zip
+          files: out/xone-driver-manager-v*.zip
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
