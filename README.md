@@ -9,6 +9,12 @@ A [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin to in
 - **Pairing mode control** - Enable/disable dongle pairing mode without leaving Gaming Mode
 - **SteamOS update detection** - Automatically notifies you when drivers need reinstalling after a system update
 
+## Screenshots
+
+| Not Installed | Installing | Installed |
+|:---:|:---:|:---:|
+| ![Not Installed](assets/not-installed.png) | ![Installing](assets/installing.png) | ![Installed](assets/installed.png) |
+
 ## Installation
 
 ### From Decky Plugin Store (Recommended)
