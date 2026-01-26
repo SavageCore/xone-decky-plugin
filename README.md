@@ -35,7 +35,7 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 
 ### Manual Installation
 
-1. Download the latest release `.zip` from the [Releases](https://github.com/SavageCore/xone-decky-plugin/releases) page
+1. Download the `.zip` from the latest [releases](https://github.com/SavageCore/xone-decky-plugin/releases/latest) page
 2. Open the Decky settings and navigate to Developer menu
 3. Click `Install Plugin from ZIP File`
 4. Select the downloaded `.zip` file
