@@ -1,19 +1,12 @@
 {
-    "name": "Xone Driver Manager",
-    "author": "SavageCore",
-    "flags": [
-        "root"
-    ],
-    "api_version": 1,
-    "version": "0.1.0",
-    "publish": {
-        "tags": [
-            "controller",
-            "xbox",
-            "drivers",
-            "xone"
-        ],
-        "description": "Modern Xbox controller driver (xone) management with legacy support (xpad-noone) for Steam Deck.",
-        "image": "https://raw.githubusercontent.com/SavageCore/xone-decky-plugin/main/assets/installed.png"
-    }
+  "name": "Xone Driver Manager",
+  "author": "SavageCore",
+  "flags": ["root"],
+  "api_version": 1,
+  "version": "0.1.0",
+  "publish": {
+    "tags": ["controller", "xbox", "drivers", "xone"],
+    "description": "Modern Xbox controller driver (xone) management with legacy support (xpad-noone) for Steam Deck.",
+    "image": "https://raw.githubusercontent.com/SavageCore/xone-decky-plugin/main/assets/installed.png"
+  }
 }

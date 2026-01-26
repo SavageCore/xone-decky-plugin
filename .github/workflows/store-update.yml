@@ -53,7 +53,7 @@ jobs:
           # Commit and push the submodule update
           git add "plugins/$PLUGIN_NAME"
           git commit -m "Update $PLUGIN_NAME to v${{ steps.get_version.outputs.VERSION }}"
-          
+
           echo "Pushing changes to fork..."
           git push origin "$BRANCH_NAME"
 

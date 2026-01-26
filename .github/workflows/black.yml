@@ -20,5 +20,5 @@ jobs:
       - name: Check files using the black formatter
         uses: psf/black@stable
         with:
-          options: "--check --verbose"
-          src: "."
+          options: '--check --verbose'
+          src: '.'

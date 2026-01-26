@@ -1,0 +1,34 @@
+name: JS/TS Linting
+
+on:
+  push:
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - '.github/workflows/standard.yml'
+  pull_request:
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - '.github/workflows/standard.yml'
+  workflow_dispatch:
+
+jobs:
+  lint:
+    name: Standard JS Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run Standard Lint
+        run: pnpm run lint
