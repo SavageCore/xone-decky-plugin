@@ -13,6 +13,20 @@ XPAD_NOONE_VERSION = "1.0"
 
 REQUIRED_PACKAGES = ["curl", "wget", "git", "gcc", "cabextract", "dkms", "libisl", "libmpc", "plymouth"]
 
+def get_clean_env():
+    """Get a clean environment for subprocess calls.
+    
+    Decky's environment can have LD_LIBRARY_PATH/LD_PRELOAD that conflict
+    with system binaries like bash/readline. We need to clean these.
+    """
+    env = os.environ.copy()
+    # Add common binary paths
+    env["PATH"] = "/usr/sbin:/usr/bin:/sbin:/bin:" + env.get("PATH", "")
+    # Remove library overrides that can cause conflicts
+    env.pop("LD_LIBRARY_PATH", None)
+    env.pop("LD_PRELOAD", None)
+    return env
+
 class Plugin:
     """Xone Driver Manager Decky Plugin"""
     
@@ -39,17 +53,28 @@ class Plugin:
     async def get_install_status(self) -> dict:
         """Check if xone and xpad-noone drivers are installed"""
         try:
+            env = get_clean_env()
+            
             xone_result = subprocess.run(
                 ["dkms", "status", "xone"],
-                capture_output=True, text=True
+                capture_output=True, text=True,
+                env=env
             )
             xpad_result = subprocess.run(
                 ["dkms", "status", "xpad-noone"],
-                capture_output=True, text=True
+                capture_output=True, text=True,
+                env=env
             )
             
-            xone_installed = len(xone_result.stdout.strip()) > 0
-            xpad_installed = len(xpad_result.stdout.strip()) > 0
+            # Log the results for debugging
+            decky.logger.info(f"dkms status xone: stdout='{xone_result.stdout.strip()}' stderr='{xone_result.stderr.strip()}' rc={xone_result.returncode}")
+            decky.logger.info(f"dkms status xpad-noone: stdout='{xpad_result.stdout.strip()}' stderr='{xpad_result.stderr.strip()}' rc={xpad_result.returncode}")
+            
+            # Check for "installed" in the output (more reliable than just checking if non-empty)
+            xone_installed = "installed" in xone_result.stdout.lower()
+            xpad_installed = "installed" in xpad_result.stdout.lower()
+            
+            decky.logger.info(f"Install status: xone={xone_installed}, xpad={xpad_installed}")
             
             return {
                 "xone_installed": xone_installed,
@@ -90,7 +115,8 @@ class Plugin:
             # Get current kernel version
             current_kernel = subprocess.run(
                 ["uname", "-r"],
-                capture_output=True, text=True
+                capture_output=True, text=True,
+                env=get_clean_env()
             ).stdout.strip()
             
             # Read saved kernel version
@@ -117,7 +143,8 @@ class Plugin:
             if version is None:
                 version = subprocess.run(
                     ["uname", "-r"],
-                    capture_output=True, text=True
+                    capture_output=True, text=True,
+                    env=get_clean_env()
                 ).stdout.strip()
             
             settings_dir = os.environ.get("DECKY_PLUGIN_SETTINGS_DIR", "/tmp")
@@ -185,11 +212,12 @@ class Plugin:
             if not os.path.exists(install_script):
                 return {"success": False, "error": "Install script not found"}
             
-            # Run install script
+            # Run install script with clean environment
             result = subprocess.run(
                 ["bash", install_script],
                 capture_output=True, text=True,
-                timeout=600  # 10 minute timeout
+                timeout=600,  # 10 minute timeout
+                env=get_clean_env()
             )
             
             if result.returncode != 0:
@@ -224,11 +252,12 @@ class Plugin:
             if not os.path.exists(uninstall_script):
                 return {"success": False, "error": "Uninstall script not found"}
             
-            # Run uninstall script
+            # Run uninstall script with clean environment
             result = subprocess.run(
                 ["bash", uninstall_script],
                 capture_output=True, text=True,
-                timeout=300  # 5 minute timeout
+                timeout=300,  # 5 minute timeout
+                env=get_clean_env()
             )
             
             if result.returncode != 0:
