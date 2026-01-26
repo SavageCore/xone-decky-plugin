@@ -97,7 +97,7 @@ function Content() {
             if (result.success) {
                 toaster.toast({
                     title: "Installation Complete",
-                    body: "Xbox wireless controller drivers installed successfully!",
+                    body: "Drivers installed successfully!",
                     duration: 5000
                 });
                 setIsInstalled(true);
@@ -136,7 +136,7 @@ function Content() {
         setIsUninstalling(true);
         toaster.toast({
             title: "Uninstalling Drivers",
-            body: "Removing Xbox wireless controller drivers...",
+            body: "Removing drivers...",
             duration: 3000
         });
 
@@ -146,7 +146,7 @@ function Content() {
             if (result.success) {
                 toaster.toast({
                     title: "Uninstall Complete",
-                    body: "Xbox wireless controller drivers removed.",
+                    body: "Drivers removed",
                     duration: 5000
                 });
                 setIsInstalled(false);
@@ -182,8 +182,8 @@ function Content() {
                 toaster.toast({
                     title: enabled ? "Pairing Mode Enabled" : "Pairing Mode Disabled",
                     body: enabled
-                        ? "Press the pairing button on your controller to connect."
-                        : "Pairing mode turned off.",
+                        ? "Press the pairing button on your controller to connect"
+                        : "Pairing mode turned off",
                     duration: 4000
                 });
             } else {
@@ -291,10 +291,11 @@ function Content() {
                         padding: "10px",
                         fontSize: "12px",
                         color: "#aaa",
-                        textAlign: "left"
+                        lineHeight: "1.4"
                     }}>
-                        <p><b>xone:</b> Modern driver for Xbox One/Series accessories. Disables xpad.</p>
-                        <p><b>xpad-noone:</b> Replacement for xpad to support legacy Xbox 360 peripherals.</p>
+                        <div style={{ marginBottom: "8px" }}>Driver management for Xbox One & Series controllers. Supports wired and wireless (via optional Xbox Wireless Adaptor for Windows)</div>
+                        <div><b>xone</b>: Modern replacement for xpad</div>
+                        <div style={{ marginTop: "4px" }}><b>xpad-noone</b>: Legacy support for 360 peripherals (GP2040-CE! ❤️)</div>
                     </div>
                 </PanelSectionRow>
             )}

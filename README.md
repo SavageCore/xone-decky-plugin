@@ -51,6 +51,7 @@ When SteamOS updates, kernel modules are often removed. The plugin will detect t
 ## Requirements
 
 - [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) installed
+- Xbox One or Series controller (wired) or Xbox Wireless Adaptor for Windows (wireless)
 
 ## Credits
 
