@@ -34,6 +34,8 @@ const installDrivers = callable<[], {
     success: boolean;
     error?: string;
     output?: string;
+    reboot_required?: boolean;
+    message?: string;
 }>("install_drivers");
 
 const uninstallDrivers = callable<[], {
@@ -104,6 +106,13 @@ function Content() {
                 const pairingStatus = await getPairingStatus();
                 setPairingAvailable(pairingStatus.available);
                 setIsPairing(pairingStatus.pairing);
+            } else if (result.reboot_required) {
+                // Kernel was upgraded, reboot needed
+                toaster.toast({
+                    title: "Reboot Required",
+                    body: "Kernel mismatch detected. Please reboot and reinstall drivers.",
+                    duration: 15000
+                });
             } else {
                 toaster.toast({
                     title: "Installation Failed",

@@ -26,6 +26,43 @@ log_error() {
     echo "[ERROR] $1" >&2
 }
 
+# Check for kernel header mismatch and attempt auto-fix
+# Returns: 0 if fixed (reboot needed), 1 if no mismatch, 2 if fix failed
+check_kernel_header_mismatch() {
+    local dkms_output="$1"
+    
+    # Check if the error message indicates missing kernel headers
+    if echo "$dkms_output" | grep -q "Your kernel headers for kernel .* cannot be found"; then
+        log_error "Kernel headers mismatch detected!"
+        log_info "Your running kernel does not match the installed kernel headers."
+        log_info "This is a known issue on SteamOS after system updates."
+        
+        # Get the linux-neptune package name
+        local linux_pkg
+        linux_pkg=$(pacman -Qsq linux-neptune 2>/dev/null | grep -E "^linux-neptune-[0-9]+$" | tail -n 1 || echo "")
+        
+        if [ -n "$linux_pkg" ]; then
+            log_info "Attempting to upgrade kernel package: $linux_pkg"
+            
+            if pacman -S "$linux_pkg" --noconfirm >/dev/null 2>&1; then
+                log_info "Kernel package upgraded successfully!"
+                echo "KERNEL_UPGRADED"
+                return 0  # Fixed, reboot needed
+            else
+                log_error "Failed to upgrade kernel package"
+                echo "KERNEL_UPGRADE_FAILED"
+                return 2  # Fix failed
+            fi
+        else
+            log_error "Could not determine kernel package name"
+            echo "KERNEL_PACKAGE_UNKNOWN"
+            return 2  # Fix failed
+        fi
+    fi
+    
+    return 1  # No mismatch detected
+}
+
 # Check and save steamos-readonly state
 ORIGINAL_READONLY_STATE="unknown"
 check_readonly_state() {
@@ -201,8 +238,31 @@ install_xone() {
     log_info "Installing xone driver..."
     cd "$XONE_LOCAL_REPO"
     
-    # Run the install script
-    ./install.sh --release
+    # Run the install script and capture output to check for errors
+    local install_output
+    install_output=$(./install.sh --release 2>&1) || true
+    local install_exit_code=$?
+    
+    # Check for kernel header mismatch error
+    if echo "$install_output" | grep -q "Your kernel headers for kernel .* cannot be found"; then
+        check_kernel_header_mismatch "$install_output"
+        local mismatch_result=$?
+        if [ $mismatch_result -eq 0 ]; then
+            echo "REBOOT_REQUIRED"
+            return 100  # Special code for reboot needed
+        elif [ $mismatch_result -eq 2 ]; then
+            log_error "xone installation failed - kernel header mismatch could not be fixed"
+            echo "$install_output"
+            return 1
+        fi
+    fi
+    
+    # Check if installation failed for other reasons
+    if [ $install_exit_code -ne 0 ]; then
+        log_error "xone installation failed with exit code $install_exit_code"
+        echo "$install_output"
+        return 1
+    fi
     
     log_info "Downloading xone firmware..."
     ./install/firmware.sh --skip-disclaimer
@@ -219,7 +279,32 @@ install_xpad_noone() {
     
     modprobe -r xpad-noone 2>/dev/null || true
     cp -r "$XPAD_NOONE_LOCAL_REPO" "/usr/src/xpad-noone-$XPAD_NOONE_VERSION"
-    dkms install -m xpad-noone -v "$XPAD_NOONE_VERSION"
+    
+    # Run dkms install and capture output to check for errors
+    local dkms_output
+    dkms_output=$(dkms install -m xpad-noone -v "$XPAD_NOONE_VERSION" 2>&1) || true
+    local dkms_exit_code=$?
+    
+    # Check for kernel header mismatch error
+    if echo "$dkms_output" | grep -q "Your kernel headers for kernel .* cannot be found"; then
+        check_kernel_header_mismatch "$dkms_output"
+        local mismatch_result=$?
+        if [ $mismatch_result -eq 0 ]; then
+            echo "REBOOT_REQUIRED"
+            return 100  # Special code for reboot needed
+        elif [ $mismatch_result -eq 2 ]; then
+            log_error "xpad-noone installation failed - kernel header mismatch could not be fixed"
+            echo "$dkms_output"
+            return 1
+        fi
+    fi
+    
+    # Check if installation failed for other reasons
+    if [ $dkms_exit_code -ne 0 ]; then
+        log_error "xpad-noone installation failed with exit code $dkms_exit_code"
+        echo "$dkms_output"
+        return 1
+    fi
 }
 
 # Load kernel modules
@@ -278,7 +363,26 @@ main() {
     
     # Install drivers
     install_xone
+    local xone_result=$?
+    if [ $xone_result -eq 100 ]; then
+        log_info "Kernel upgraded, reboot required"
+        echo "REBOOT_REQUIRED"
+        exit 100
+    elif [ $xone_result -ne 0 ]; then
+        log_error "xone installation failed"
+        exit 1
+    fi
+    
     install_xpad_noone
+    local xpad_result=$?
+    if [ $xpad_result -eq 100 ]; then
+        log_info "Kernel upgraded, reboot required"
+        echo "REBOOT_REQUIRED"
+        exit 100
+    elif [ $xpad_result -ne 0 ]; then
+        log_error "xpad-noone installation failed"
+        exit 1
+    fi
     
     # Load modules
     load_modules

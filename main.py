@@ -220,6 +220,16 @@ class Plugin:
                 env=get_clean_env()
             )
             
+            # Check for reboot required (exit code 100)
+            if result.returncode == 100 or "REBOOT_REQUIRED" in result.stdout:
+                decky.logger.info("Kernel upgraded, reboot required")
+                return {
+                    "success": False, 
+                    "reboot_required": True,
+                    "message": "Kernel has been upgraded to match headers. Please reboot and try again.",
+                    "output": result.stdout
+                }
+            
             if result.returncode != 0:
                 decky.logger.error(f"Install failed: {result.stderr}")
                 return {
