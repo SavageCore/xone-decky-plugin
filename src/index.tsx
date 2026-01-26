@@ -219,7 +219,7 @@ function Content() {
                     textAlign: "center"
                 }}>
                     <span style={{ fontWeight: "bold" }}>
-                        Status: {isInstalled ? "✓ Drivers Installed" : "✗ Drivers Not Installed"}
+                        {isInstalled ? "Drivers Installed" : "Drivers Not Installed"}
                     </span>
                 </div>
             </PanelSectionRow>
