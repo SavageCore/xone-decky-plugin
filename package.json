@@ -1,6 +1,6 @@
 {
     "name": "xone-decky-plugin",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "Decky Loader plugin to manage xone and xpad-noone drivers on Steam Deck",
     "type": "module",
     "scripts": {
