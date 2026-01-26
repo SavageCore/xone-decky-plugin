@@ -301,8 +301,8 @@ export default definePlugin(() => {
         (oldKernel, newKernel) => {
             console.log(`Kernel update detected: ${oldKernel} -> ${newKernel}`);
             toaster.toast({
-                title: "SteamOS Updated",
-                body: "Your system was updated. Please reinstall the Xbox controller drivers for them to work again.",
+                title: "Xone Driver Manager",
+                body: "SteamOS updated, drivers need reinstalling",
                 duration: 10000
             });
         }
