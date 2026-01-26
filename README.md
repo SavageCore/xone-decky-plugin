@@ -13,9 +13,9 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 
 ## Screenshots
 
-| Not Installed | Installing | Installed |
-|:---:|:---:|:---:|
-| ![Not Installed](assets/not-installed.png) | ![Installing](assets/installing.png) | ![Installed](assets/installed.png) |
+| Not Installed | Installing | Installed | Pairing |
+|:---:|:---:|:---:|:---:|
+| ![Not Installed](assets/not-installed.png) | ![Installing](assets/installing.png) | ![Installed](assets/installed.png) | ![Pairing](assets/pairing.png) |
 
 ## Installation
 
