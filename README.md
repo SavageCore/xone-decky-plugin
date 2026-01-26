@@ -1,3 +1,7 @@
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SavageCore/xone-decky-plugin/shellcheck.yml?style=for-the-badge&label=ShellCheck)
+ ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/SavageCore/xone-decky-plugin/total?style=for-the-badge)
+
+
 # Xone Driver Manager - Decky Plugin
 
 A [Decky Loader](https://github.com/SteamDeckHomebrew/decky-loader) plugin to install and manage the [xone](https://github.com/dlundqvist/xone) Linux kernel driver for Xbox One and Xbox Series X|S accessories. 
