@@ -35,9 +35,18 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 
 ### Manual Installation
 
-1. Download the latest release from the [Releases](https://github.com/SavageCore/xone-decky-plugin/releases) page
-2. Extract to `~/homebrew/plugins/xone-controller-manager/`
-3. Restart Decky Loader
+1. Download the latest release `.zip` from the [Releases](https://github.com/SavageCore/xone-decky-plugin/releases) page
+2. Open the Decky settings and navigate to Developer menu
+3. Click `Install Plugin from ZIP File`
+4. Select the downloaded `.zip` file
+
+### Building from Source
+
+1. Clone the repository
+2. Run `pnpm install` to install dependencies
+3. Run `pnpm run package` to build and package the plugin
+4. Transfer the `.zip` file in the `out/` directory to your Steam Deck
+5. Follow the manual installation steps above
 
 ## Usage
 
