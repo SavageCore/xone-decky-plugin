@@ -22,7 +22,7 @@ importers:
         specifier: ^1.0.2
         version: 1.0.2
       '@decky/ui':
-        specifier: ^4.11.0
+        specifier: ^4.11.1
         version: 4.11.1
       '@rollup/rollup-linux-x64-musl':
         specifier: ^4.53.3
