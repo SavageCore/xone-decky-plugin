@@ -112,10 +112,12 @@ class Plugin:
         try:
             pairing_paths = glob.glob("/sys/bus/usb/drivers/xone-dongle/*/pairing")
             if not pairing_paths:
+                decky.logger.info("No pairing path found")
                 return {"available": False, "pairing": False}
 
             with open(pairing_paths[0], "r") as f:
                 status = f.read().strip()
+                decky.logger.info(f"Pairing status from hardware: '{status}'")
 
             return {"available": True, "pairing": status == "1"}
         except Exception as e:

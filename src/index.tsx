@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   ButtonItem,
   PanelSection,
@@ -66,7 +66,7 @@ const disablePairing = callable<
   }
 >('disable_pairing')
 
-function Content() {
+function Content () {
   const [isInstalled, setIsInstalled] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isInstalling, setIsInstalling] = useState<boolean>(false)
@@ -74,6 +74,8 @@ function Content() {
   const [pairingAvailable, setPairingAvailable] = useState<boolean>(false)
   const [isPairing, setIsPairing] = useState<boolean>(false)
   const [pairingLoading, setPairingLoading] = useState<boolean>(false)
+  const isPairingActionInProgress = useRef<boolean>(false)
+  const lastActionTime = useRef<number>(0)
 
   // Check status on mount
   useEffect(() => {
@@ -93,6 +95,26 @@ function Content() {
     }
 
     checkStatus()
+
+    // Poll pairing status every second when plugin is open
+    const pollInterval = setInterval(async () => {
+      // Don't update from poll if we are currently performing an action
+      // or if we just performed one (2 second cooldown)
+      if (isPairingActionInProgress.current || Date.now() - lastActionTime.current < 2000) {
+        return
+      }
+
+      try {
+        const pairingStatus = await getPairingStatus()
+        console.debug('Pairing status poll result:', pairingStatus)
+        setPairingAvailable(pairingStatus.available)
+        setIsPairing(pairingStatus.pairing)
+      } catch (e) {
+        console.error('Error polling pairing status:', e)
+      }
+    }, 1000)
+
+    return () => clearInterval(pollInterval)
   }, [])
 
   const handleInstall = async () => {
@@ -185,6 +207,8 @@ function Content() {
 
   const handlePairingToggle = async (enabled: boolean) => {
     setPairingLoading(true)
+    isPairingActionInProgress.current = true
+    lastActionTime.current = Date.now()
 
     try {
       const result = enabled ? await enablePairing() : await disablePairing()
@@ -214,6 +238,8 @@ function Content() {
       })
     } finally {
       setPairingLoading(false)
+      isPairingActionInProgress.current = false
+      lastActionTime.current = Date.now() // Update again after action finishes
     }
   }
 
@@ -267,14 +293,14 @@ function Content() {
                 <Spinner style={{ width: '16px', height: '16px' }} />
                 Installing...
               </span>
-            )
+              )
             : isInstalled
               ? (
-                'Reinstall Drivers'
-              )
+                  'Reinstall Drivers'
+                )
               : (
-                'Install Drivers'
-              )}
+                  'Install Drivers'
+                )}
         </ButtonItem>
       </PanelSectionRow>
 
@@ -299,10 +325,10 @@ function Content() {
                   <Spinner style={{ width: '16px', height: '16px' }} />
                   Uninstalling...
                 </span>
-              )
+                )
               : (
-                'Uninstall Drivers'
-              )}
+                  'Uninstall Drivers'
+                )}
           </ButtonItem>
         </PanelSectionRow>
       )}
@@ -371,7 +397,7 @@ export default definePlugin(() => {
     titleView: <div className={staticClasses.Title}>Xone Driver Manager</div>,
     content: <Content />,
     icon: <FaGamepad />,
-    onDismount() {
+    onDismount () {
       console.log('Xone Driver Manager plugin unloaded')
       removeEventListener('kernel_update_detected', kernelUpdateListener)
     }
