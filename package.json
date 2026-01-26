@@ -1,6 +1,6 @@
 {
     "name": "xone-decky-plugin",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "description": "Decky Loader plugin to install Xbox wireless controller drivers (xone & xpad-noone) on Steam Deck",
     "type": "module",
     "scripts": {
