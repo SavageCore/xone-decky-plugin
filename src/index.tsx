@@ -291,9 +291,10 @@ function Content() {
                         padding: "10px",
                         fontSize: "12px",
                         color: "#aaa",
-                        textAlign: "center"
+                        textAlign: "left"
                     }}>
-                        Install the xone & xpad-noone drivers to use Xbox wireless controllers with the official Microsoft adapter.
+                        <p><b>xone:</b> Modern driver for Xbox One/Series accessories. Disables xpad.</p>
+                        <p><b>xpad-noone:</b> Replacement for xpad to support legacy Xbox 360 peripherals.</p>
                     </div>
                 </PanelSectionRow>
             )}
