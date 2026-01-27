@@ -27,6 +27,9 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 
 ### From Decky Plugin Store (Recommended)
 
+> [!NOTE]
+> The store maintainers haven't reviewed the PR yet, so manual install is currently required. Please follow the [Manual Installation](#manual-installation) steps below.
+
 1. Open Quick Access Menu (⋯ button)
 2. Go to the Decky tab (plug icon)
 3. Open the Plugin Store
