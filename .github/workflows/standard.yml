@@ -2,17 +2,7 @@ name: JS/TS Linting
 
 on:
   push:
-    paths:
-      - '**.js'
-      - '**.ts'
-      - '**.tsx'
-      - '.github/workflows/standard.yml'
   pull_request:
-    paths:
-      - '**.js'
-      - '**.ts'
-      - '**.tsx'
-      - '.github/workflows/standard.yml'
   workflow_dispatch:
 
 jobs:

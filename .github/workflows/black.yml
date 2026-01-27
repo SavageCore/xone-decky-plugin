@@ -2,13 +2,7 @@ name: Black
 
 on:
   push:
-    paths:
-      - '**.py'
-      - '.github/workflows/black.yml'
   pull_request:
-    paths:
-      - '**.py'
-      - '.github/workflows/black.yml'
   workflow_dispatch:
 
 jobs:
