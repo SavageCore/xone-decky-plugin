@@ -26,9 +26,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Build plugin
-        run: pnpm run build
-
       - name: Create package
         run: pnpm run package
 
