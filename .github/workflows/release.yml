@@ -32,7 +32,7 @@ jobs:
           chmod +x /usr/local/bin/decky
 
       - name: Create package
-        run: pnpm run package:linux
+        run: decky plugin build .
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
