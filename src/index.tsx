@@ -12,61 +12,61 @@ import { FaGamepad } from 'react-icons/fa'
 
 // Backend callable functions
 const getInstallStatus = callable<
-  [],
-  {
-    xone_installed: boolean
-    xpad_installed: boolean
-    fully_installed: boolean
-    error?: string
-  }
+[],
+{
+  xone_installed: boolean
+  xpad_installed: boolean
+  fully_installed: boolean
+  error?: string
+}
 >('get_install_status')
 
 const getPairingStatus = callable<
-  [],
-  {
-    available: boolean
-    pairing: boolean
-    error?: string
-  }
+[],
+{
+  available: boolean
+  pairing: boolean
+  error?: string
+}
 >('get_pairing_status')
 
 const installDrivers = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-    output?: string
-    reboot_required?: boolean
-    message?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+  output?: string
+  reboot_required?: boolean
+  message?: string
+}
 >('install_drivers')
 
 const uninstallDrivers = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-    output?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+  output?: string
+}
 >('uninstall_drivers')
 
 const enablePairing = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+}
 >('enable_pairing')
 
 const disablePairing = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+}
 >('disable_pairing')
 
-function Content () {
+function Content (): React.ReactElement {
   const [isInstalled, setIsInstalled] = useState<boolean>(false)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isInstalling, setIsInstalling] = useState<boolean>(false)
@@ -79,7 +79,7 @@ function Content () {
 
   // Check status on mount
   useEffect(() => {
-    const checkStatus = async () => {
+    const checkStatus = async (): Promise<void> => {
       try {
         const installStatus = await getInstallStatus()
         setIsInstalled(installStatus.fully_installed)
@@ -94,30 +94,32 @@ function Content () {
       }
     }
 
-    checkStatus()
+    void checkStatus()
 
     // Poll pairing status every second when plugin is open
-    const pollInterval = setInterval(async () => {
-      // Don't update from poll if we are currently performing an action
-      // or if we just performed one (2 second cooldown)
-      if (isPairingActionInProgress.current || Date.now() - lastActionTime.current < 2000) {
-        return
-      }
+    const pollInterval = setInterval(() => {
+      void (async () => {
+        // Don't update from poll if we are currently performing an action
+        // or if we just performed one (2 second cooldown)
+        if (isPairingActionInProgress.current || Date.now() - lastActionTime.current < 2000) {
+          return
+        }
 
-      try {
-        const pairingStatus = await getPairingStatus()
-        console.debug('Pairing status poll result:', pairingStatus)
-        setPairingAvailable(pairingStatus.available)
-        setIsPairing(pairingStatus.pairing)
-      } catch (e) {
-        console.error('Error polling pairing status:', e)
-      }
+        try {
+          const pairingStatus = await getPairingStatus()
+          console.debug('Pairing status poll result:', pairingStatus)
+          setPairingAvailable(pairingStatus.available)
+          setIsPairing(pairingStatus.pairing)
+        } catch (e) {
+          console.error('Error polling pairing status:', e)
+        }
+      })()
     }, 1000)
 
     return () => clearInterval(pollInterval)
   }, [])
 
-  const handleInstall = async () => {
+  const handleInstall = async (): Promise<void> => {
     setIsInstalling(true)
     toaster.toast({
       title: 'Installing Drivers',
@@ -140,7 +142,7 @@ function Content () {
         const pairingStatus = await getPairingStatus()
         setPairingAvailable(pairingStatus.available)
         setIsPairing(pairingStatus.pairing)
-      } else if (result.reboot_required) {
+      } else if (result.reboot_required === true) {
         // Kernel was upgraded, reboot needed
         toaster.toast({
           title: 'Reboot Required',
@@ -150,7 +152,7 @@ function Content () {
       } else {
         toaster.toast({
           title: 'Installation Failed',
-          body: result.error || 'An error occurred during installation',
+          body: (result.error !== undefined && result.error !== '') ? result.error : 'An error occurred during installation',
           duration: 8000
         })
       }
@@ -166,7 +168,7 @@ function Content () {
     }
   }
 
-  const handleUninstall = async () => {
+  const handleUninstall = async (): Promise<void> => {
     setIsUninstalling(true)
     toaster.toast({
       title: 'Uninstalling Drivers',
@@ -189,7 +191,7 @@ function Content () {
       } else {
         toaster.toast({
           title: 'Uninstall Failed',
-          body: result.error || 'An error occurred during uninstallation',
+          body: (result.error !== undefined && result.error !== '') ? result.error : 'An error occurred during uninstallation',
           duration: 8000
         })
       }
@@ -205,7 +207,7 @@ function Content () {
     }
   }
 
-  const handlePairingToggle = async (enabled: boolean) => {
+  const handlePairingToggle = async (enabled: boolean): Promise<void> => {
     setPairingLoading(true)
     isPairingActionInProgress.current = true
     lastActionTime.current = Date.now()
@@ -225,7 +227,7 @@ function Content () {
       } else {
         toaster.toast({
           title: 'Pairing Error',
-          body: result.error || 'Failed to change pairing mode',
+          body: (result.error !== undefined && result.error !== '') ? result.error : 'Failed to change pairing mode',
           duration: 5000
         })
       }
@@ -277,7 +279,7 @@ function Content () {
       <PanelSectionRow>
         <ButtonItem
           layout='below'
-          onClick={handleInstall}
+          onClick={() => { void handleInstall() }}
           disabled={isInstalling || isUninstalling}
         >
           {isInstalling
@@ -309,7 +311,7 @@ function Content () {
         <PanelSectionRow>
           <ButtonItem
             layout='below'
-            onClick={handleUninstall}
+            onClick={() => { void handleUninstall() }}
             disabled={isInstalling || isUninstalling}
           >
             {isUninstalling
@@ -343,7 +345,7 @@ function Content () {
             }
             checked={isPairing}
             disabled={pairingLoading}
-            onChange={handlePairingToggle}
+            onChange={(enabled) => { void handlePairingToggle(enabled) }}
           />
         </PanelSectionRow>
       )}

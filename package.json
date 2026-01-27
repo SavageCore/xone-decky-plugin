@@ -9,8 +9,8 @@
     "package": "pnpm run build && node scripts/package.js",
     "crop-screenshots": "node scripts/crop-screenshots.js",
     "version": "node scripts/sync-version.js",
-    "lint": "standard \"**/*.{js,ts,tsx}\"",
-    "format": "standard --fix \"**/*.{js,ts,tsx}\""
+    "lint": "ts-standard \"**/*.{js,ts,tsx}\"",
+    "format": "ts-standard --fix \"**/*.{js,ts,tsx}\""
   },
   "repository": {
     "type": "git",
@@ -38,13 +38,10 @@
     "@types/react": "19.1.1",
     "@types/react-dom": "19.1.1",
     "@types/webpack": "^5.28.5",
-    "@typescript-eslint/eslint-plugin": "^8.0.0",
-    "@typescript-eslint/parser": "^8.0.0",
     "archiver": "^7.0.1",
-    "eslint": "^8.57.0",
     "rollup": "^4.53.3",
     "sharp": "^0.34.5",
-    "standard": "^17.1.2",
+    "ts-standard": "^12.0.2",
     "typescript": "^5.6.2"
   },
   "dependencies": {
@@ -59,15 +56,5 @@
         "react-dom"
       ]
     }
-  },
-  "standard": {
-    "parser": "@typescript-eslint/parser",
-    "plugins": [
-      "@typescript-eslint/eslint-plugin"
-    ],
-    "env": [
-      "browser",
-      "node"
-    ]
   }
 }
