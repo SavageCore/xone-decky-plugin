@@ -26,13 +26,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Install decky-cli
+        run: |
+          curl -L -o /usr/local/bin/decky "https://github.com/SteamDeckHomebrew/cli/releases/latest/download/decky-linux-x86_64"
+          chmod +x /usr/local/bin/decky
+
       - name: Create package
-        run: pnpm run package
+        run: pnpm run package:linux
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: out/xone-driver-manager-v*.zip
+          files: out/*.zip
           generate_release_notes: true
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
