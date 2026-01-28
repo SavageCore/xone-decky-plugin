@@ -33,7 +33,7 @@
   "devDependencies": {
     "@decky/rollup": "^1.0.2",
     "@decky/ui": "^4.11.1",
-    "@rollup/rollup-linux-x64-musl": "^4.53.3",
+    "@rollup/rollup-linux-x64-musl": "^4.57.0",
     "@types/archiver": "^7.0.0",
     "@types/react": "19.2.10",
     "@types/react-dom": "19.2.3",
