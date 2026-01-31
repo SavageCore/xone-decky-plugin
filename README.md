@@ -37,7 +37,7 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 
 Since this plugin is not on the Decky Store, you won't get automatic updates through the store/Decky Loader.
 
-However, as of version 0.2.0, the plugin will show you when a new version is available and provide a button to download it. You can then follow the manual installation steps to update.
+Starting with version 0.3.0, the plugin includes a built-in auto-update system. When a new release is detected, a button will appear allowing you to download and install the update seamlessly. The Quick Access Menu will briefly refresh to apply the changes.
 
 ### Building from Source
 

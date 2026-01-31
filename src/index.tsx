@@ -6,10 +6,15 @@ import {
   ToggleField,
   staticClasses,
   Spinner,
-  ModalRoot,
-  showModal
+  Navigation
 } from '@decky/ui'
-import { addEventListener, removeEventListener, callable, definePlugin, toaster } from '@decky/api'
+import {
+  addEventListener,
+  removeEventListener,
+  callable,
+  definePlugin,
+  toaster
+} from '@decky/api'
 import { FaGamepad } from 'react-icons/fa'
 
 // Backend callable functions
@@ -92,48 +97,7 @@ const downloadLatestRelease = callable<
 }
 >('download_latest_release')
 
-const UpdateModal: React.FC<{ filename: string, version: string, close: () => void }> = ({
-  filename,
-  version,
-  close
-}) => {
-  return (
-    <ModalRoot onCancel={close} closeModal={close} title={`Update Instructions (v${version})`}>
-      <PanelSection>
-        <PanelSectionRow>
-          <div style={{ padding: '10px', fontSize: '14px', lineHeight: '1.5' }}>
-            A valid update file was found in your Downloads folder:
-            <div style={{ marginTop: '8px', marginBottom: '12px' }}>
-              <code style={{
-                backgroundColor: 'rgba(0,0,0,0.5)',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                color: '#5ba32b',
-                fontWeight: 'bold'
-              }}
-              >
-                {filename}
-              </code>
-            </div>
-            <strong>To install this update manually:</strong>
-            <ol style={{ marginTop: '8px', paddingLeft: '20px' }}>
-              <li style={{ marginBottom: '4px' }}>Open the <b>Decky Settings</b></li>
-              <li style={{ marginBottom: '4px' }}>Navigate to <b>Developer</b></li>
-              <li style={{ marginBottom: '4px' }}>Scroll down to <b>Install Plugin from ZIP File</b></li>
-              <li style={{ marginBottom: '4px' }}>Navigate to <b>Downloads</b> folder and select the file named above</li>
-            </ol>
-            <div style={{ marginTop: '12px', fontSize: '12px', color: '#888' }}>
-              Note: You can delete the ZIP file from your Downloads folder after installation.
-            </div>
-          </div>
-        </PanelSectionRow>
-        <PanelSectionRow>
-          <ButtonItem onClick={close} layout='below'>Close</ButtonItem>
-        </PanelSectionRow>
-      </PanelSection>
-    </ModalRoot>
-  )
-}
+const applyUpdate = callable<[], { success: boolean, error?: string }>('apply_update')
 
 function Content (): React.ReactElement {
   const [isInstalled, setIsInstalled] = useState<boolean>(false)
@@ -151,7 +115,7 @@ function Content (): React.ReactElement {
     filename?: string
     fileExists?: boolean
   }>({ available: false })
-  const [isDownloading, setIsDownloading] = useState<boolean>(false)
+  const [isUpdating, setIsUpdating] = useState<boolean>(false)
   const isPairingActionInProgress = useRef<boolean>(false)
   const lastActionTime = useRef<number>(0)
 
@@ -275,41 +239,38 @@ function Content (): React.ReactElement {
     }
   }
 
-  const handleDownloadUpdate = async (): Promise<void> => {
+  const handleUpdate = async (): Promise<void> => {
     if (updateInfo.url === undefined || updateInfo.url === null) return
-    setIsDownloading(true)
-    toaster.toast({ title: 'Xone Driver Manager', body: 'Downloading to Downloads folder...', duration: 3000 })
+    setIsUpdating(true)
     try {
-      const result = await downloadLatestRelease(updateInfo.url)
-      if (result.success) {
-        toaster.toast({ title: 'Xone Driver Manager', body: `Saved to ${result.path ?? ''}`, duration: 10000 })
-        const update = await checkForUpdates()
-        setUpdateInfo({
-          available: true,
-          version: update.latest_version,
-          url: update.download_url,
-          filename: update.filename,
-          fileExists: update.file_exists
-        })
+      // 1. Download if file doesn't exist locally
+      if (updateInfo.fileExists !== true) {
+        toaster.toast({ title: 'Xone Driver Manager', body: 'Downloading update...', duration: 3000 })
+        const downloadResult = await downloadLatestRelease(updateInfo.url)
+        if (!downloadResult.success) {
+          toaster.toast({ title: 'Xone Driver Manager', body: (((downloadResult.error ?? '') !== '') ? (downloadResult.error ?? '') : 'Download failed'), duration: 5000 })
+          return
+        }
+      }
+
+      // 2. Apply update
+      const applyResult = await applyUpdate()
+      if (applyResult.success) {
+        // 3. Refresh sidebar
+        setTimeout(() => {
+          Navigation.CloseSideMenus()
+          setTimeout(() => {
+            Navigation.OpenQuickAccessMenu(999)
+          }, 500)
+        }, 1500)
       } else {
-        toaster.toast({ title: 'Xone Driver Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Download failed'), duration: 5000 })
+        toaster.toast({ title: 'Xone Manager', body: (((applyResult.error ?? '') !== '') ? (applyResult.error ?? '') : 'Update failed'), duration: 5000 })
       }
     } catch (e) {
-      toaster.toast({ title: 'Xone Driver Manager', body: String(e), duration: 5000 })
+      toaster.toast({ title: 'Xone Manager', body: String(e), duration: 5000 })
     } finally {
-      setIsDownloading(false)
+      setIsUpdating(false)
     }
-  }
-
-  const showUpdateInstructions = (): void => {
-    const modalRes = showModal(
-      <UpdateModal
-        filename={updateInfo.filename ?? ''}
-        version={updateInfo.version ?? ''}
-        close={() => { modalRes.Close() }}
-      />,
-      window
-    )
   }
 
   if (isLoading) {
@@ -381,17 +342,9 @@ function Content (): React.ReactElement {
             <div style={{ fontWeight: 'bold', color: '#5ba32b', marginBottom: '8px' }}>
               Update Available (v{updateInfo.version ?? ''})
             </div>
-            {updateInfo.fileExists === true
-              ? (
-                <ButtonItem layout='below' onClick={showUpdateInstructions}>
-                  Install Instructions
-                </ButtonItem>
-                )
-              : (
-                <ButtonItem layout='below' onClick={() => { void handleDownloadUpdate() }} disabled={isDownloading}>
-                  {isDownloading ? 'Downloading...' : 'Download Update'}
-                </ButtonItem>
-                )}
+            <ButtonItem layout='below' onClick={() => { void handleUpdate() }} disabled={isUpdating}>
+              {isUpdating ? 'Updating...' : 'Download & Install Update'}
+            </ButtonItem>
           </div>
         </PanelSectionRow>
       )}

@@ -4,6 +4,8 @@ import subprocess
 import glob
 import json
 import hashlib
+import shutil
+import zipfile
 import decky
 
 # Constants
@@ -284,6 +286,67 @@ class Plugin:
             return {"success": True, "path": dest_path}
         except Exception as e:
             decky.logger.error(f"Error downloading update: {e}")
+            return {"success": False, "error": str(e)}
+
+    async def apply_update(self) -> dict:
+        """Replace current plugin files with the downloaded update"""
+        try:
+            # 1. Verify file
+            update_status = await self.check_for_updates()
+            if not update_status.get("file_exists"):
+                return {
+                    "success": False,
+                    "error": "Update file not found or corrupted. Please redownload.",
+                }
+
+            filename = update_status.get("filename")
+            zip_path = os.path.join("/home/deck/Downloads", filename)
+
+            # 2. Setup paths
+            current_plugin_dir = os.path.dirname(os.path.abspath(__file__))
+            temp_extract = "/tmp/xone_update_extract"
+
+            # Cleanup temp
+            if os.path.exists(temp_extract):
+                shutil.rmtree(temp_extract)
+            os.makedirs(temp_extract)
+
+            # 3. Extract
+            decky.logger.info(f"Extracting {zip_path} to {temp_extract}")
+            with zipfile.ZipFile(zip_path, "r") as zip_ref:
+                zip_ref.extractall(temp_extract)
+
+            # Find the inner folder (e.g. xone-decky-plugin)
+            inner_folders = [
+                f
+                for f in os.listdir(temp_extract)
+                if os.path.isdir(os.path.join(temp_extract, f))
+            ]
+            if not inner_folders:
+                return {
+                    "success": False,
+                    "error": "Invalid zip structure: no folder found",
+                }
+
+            new_files_dir = os.path.join(temp_extract, inner_folders[0])
+
+            # 4. Backup and Replace
+            backup_dir = current_plugin_dir + ".bak"
+            if os.path.exists(backup_dir):
+                shutil.rmtree(backup_dir)
+
+            decky.logger.info(f"Replacing {current_plugin_dir} with {new_files_dir}")
+            # Renaming the current running dir is allowed on Linux
+            os.rename(current_plugin_dir, backup_dir)
+            shutil.move(new_files_dir, current_plugin_dir)
+
+            # cleanup
+            shutil.rmtree(temp_extract)
+
+            return {"success": True}
+
+        except Exception as e:
+            decky.logger.error(f"Error applying update: {e}")
             return {"success": False, "error": str(e)}
 
     async def get_pairing_status(self) -> dict:
