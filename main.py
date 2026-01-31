@@ -343,6 +343,16 @@ class Plugin:
             # cleanup
             shutil.rmtree(temp_extract)
 
+            # Remove the ZIP file after successful extraction/replacement
+            if os.path.exists(zip_path):
+                os.remove(zip_path)
+                decky.logger.info(f"Removed update ZIP: {zip_path}")
+
+            # Remove the backup directory as requested
+            if os.path.exists(backup_dir):
+                shutil.rmtree(backup_dir)
+                decky.logger.info(f"Removed backup directory: {backup_dir}")
+
             return {"success": True}
 
         except Exception as e:
