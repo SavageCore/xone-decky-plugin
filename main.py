@@ -407,9 +407,7 @@ class Plugin:
             plugin_dir = os.environ.get(
                 "DECKY_PLUGIN_DIR", os.path.dirname(os.path.abspath(__file__))
             )
-            install_script = os.path.join(
-                plugin_dir, "scripts", "install.sh"
-            )
+            install_script = os.path.join(plugin_dir, "scripts", "install.sh")
 
             if not os.path.exists(install_script):
                 return {"success": False, "error": "Install script not found"}
@@ -462,9 +460,7 @@ class Plugin:
             plugin_dir = os.environ.get(
                 "DECKY_PLUGIN_DIR", os.path.dirname(os.path.abspath(__file__))
             )
-            uninstall_script = os.path.join(
-                plugin_dir, "scripts", "uninstall.sh"
-            )
+            uninstall_script = os.path.join(plugin_dir, "scripts", "uninstall.sh")
 
             if not os.path.exists(uninstall_script):
                 return {"success": False, "error": "Uninstall script not found"}
