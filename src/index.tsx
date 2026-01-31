@@ -209,22 +209,22 @@ function Content (): React.ReactElement {
 
   const handleInstall = async (): Promise<void> => {
     setIsInstalling(true)
-    toaster.toast({ title: 'Xone Manager', body: 'Installing drivers...', duration: 5000 })
+    toaster.toast({ title: 'Xone Driver Manager', body: 'Installing drivers...', duration: 5000 })
     try {
       const result = await installDrivers()
       if (result.success) {
-        toaster.toast({ title: 'Xone Manager', body: 'Drivers installed!', duration: 5000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: 'Drivers installed!', duration: 5000 })
         setIsInstalled(true)
         const pairingStatus = await getPairingStatus()
         setPairingAvailable(pairingStatus.available)
         setIsPairing(pairingStatus.pairing)
       } else if (result.reboot_required === true) {
-        toaster.toast({ title: 'Xone Manager', body: 'Please reboot and reinstall drivers.', duration: 15000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: 'Please reboot and reinstall drivers.', duration: 15000 })
       } else {
-        toaster.toast({ title: 'Xone Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Installation failed'), duration: 8000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Installation failed'), duration: 8000 })
       }
     } catch (e) {
-      toaster.toast({ title: 'Xone Manager', body: String(e), duration: 8000 })
+      toaster.toast({ title: 'Xone Driver Manager', body: String(e), duration: 8000 })
     } finally {
       setIsInstalling(false)
     }
@@ -232,19 +232,19 @@ function Content (): React.ReactElement {
 
   const handleUninstall = async (): Promise<void> => {
     setIsUninstalling(true)
-    toaster.toast({ title: 'Xone Manager', body: 'Removing drivers...', duration: 3000 })
+    toaster.toast({ title: 'Xone Driver Manager', body: 'Removing drivers...', duration: 3000 })
     try {
       const result = await uninstallDrivers()
       if (result.success) {
-        toaster.toast({ title: 'Xone Manager', body: 'Drivers removed', duration: 5000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: 'Drivers removed', duration: 5000 })
         setIsInstalled(false)
         setPairingAvailable(false)
         setIsPairing(false)
       } else {
-        toaster.toast({ title: 'Xone Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Uninstallation failed'), duration: 8000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Uninstallation failed'), duration: 8000 })
       }
     } catch (e) {
-      toaster.toast({ title: 'Xone Manager', body: String(e), duration: 8000 })
+      toaster.toast({ title: 'Xone Driver Manager', body: String(e), duration: 8000 })
     } finally {
       setIsUninstalling(false)
     }
@@ -278,11 +278,11 @@ function Content (): React.ReactElement {
   const handleDownloadUpdate = async (): Promise<void> => {
     if (updateInfo.url === undefined || updateInfo.url === null) return
     setIsDownloading(true)
-    toaster.toast({ title: 'Xone Manager', body: 'Downloading to Downloads folder...', duration: 3000 })
+    toaster.toast({ title: 'Xone Driver Manager', body: 'Downloading to Downloads folder...', duration: 3000 })
     try {
       const result = await downloadLatestRelease(updateInfo.url)
       if (result.success) {
-        toaster.toast({ title: 'Xone Manager', body: `Saved to ${result.path ?? ''}`, duration: 10000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: `Saved to ${result.path ?? ''}`, duration: 10000 })
         const update = await checkForUpdates()
         setUpdateInfo({
           available: true,
@@ -292,10 +292,10 @@ function Content (): React.ReactElement {
           fileExists: update.file_exists
         })
       } else {
-        toaster.toast({ title: 'Xone Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Download failed'), duration: 5000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Download failed'), duration: 5000 })
       }
     } catch (e) {
-      toaster.toast({ title: 'Xone Manager', body: String(e), duration: 5000 })
+      toaster.toast({ title: 'Xone Driver Manager', body: String(e), duration: 5000 })
     } finally {
       setIsDownloading(false)
     }
@@ -409,7 +409,7 @@ function Content (): React.ReactElement {
 export default definePlugin(() => {
   const kernelUpdateListener = addEventListener<[string, string]>(
     'kernel_update_detected',
-    () => toaster.toast({ title: 'Xone Manager', body: 'Drivers need reinstalling after OS update', duration: 10000 })
+    () => toaster.toast({ title: 'Xone Driver Manager', body: 'Drivers need reinstalling after OS update', duration: 10000 })
   )
 
   return {
