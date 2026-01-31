@@ -203,15 +203,18 @@ class Plugin:
             )
 
             if result.returncode != 0:
-                return {"update_available": False, "error": "Failed to fetch update info"}
+                return {
+                    "update_available": False,
+                    "error": "Failed to fetch update info",
+                }
 
             data = json.loads(result.stdout)
             latest_version_str = data.get("tag_name", "0.0.0")
 
             # Robust version comparison
-            update_available = self.parse_version(latest_version_str) > self.parse_version(
-                current_version_str
-            )
+            update_available = self.parse_version(
+                latest_version_str
+            ) > self.parse_version(current_version_str)
 
             # Find the zip asset
             download_url = None
