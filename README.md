@@ -26,12 +26,21 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 ## Installation
 
 > [!NOTE]
-> The Decky store does not except plugins that disable read-only so you must install manually. See [the pr](https://github.com/SteamDeckHomebrew/decky-plugin-database/pull/968#pullrequestreview-3730477839) for more information.
+> The Decky store does not accept plugins that disable read-only so you must install manually. See [the PR](https://github.com/SteamDeckHomebrew/decky-plugin-database/pull/968#pullrequestreview-3730477839) for more information.
 
-1. Download the `.zip` from the latest [releases](https://github.com/SavageCore/xone-decky-plugin/releases/latest) page
-2. Open the Decky settings and navigate to Developer menu
-3. Click `Install Plugin from ZIP File`
-4. Select the downloaded `.zip` file
+1. Download the `.zip` from the latest [releases](https://github.com/SavageCore/xone-decky-plugin/releases/latest) page.
+2. Open the Decky settings and navigate to **Developer**.
+3. Click **Install Plugin from ZIP File**.
+4. Select the downloaded `.zip` file.
+
+### Updates
+
+Since this plugin is not on the Decky Store, you won't get automatic update notifications through the store. To stay notified of new releases:
+
+1. Go to the [xone-decky-plugin](https://github.com/SavageCore/xone-decky-plugin) repository.
+2. Click the **Watch** button at the top right.
+3. Select **Custom** and check **Releases**.
+4. Click **Apply**.
 
 ### Building from Source
 
