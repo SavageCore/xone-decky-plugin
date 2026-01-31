@@ -9,8 +9,8 @@
     "package": "node ../decky-plugin-builder/src/index.js plugin build . --remote http://192.168.1.15:3000",
     "crop-screenshots": "node scripts/crop-screenshots.js",
     "version": "node scripts/sync-version.js",
-    "lint": "ts-standard \"**/*.{js,ts,tsx}\"",
-    "format": "ts-standard --fix \"**/*.{js,ts,tsx}\"",
+    "lint": "ts-standard \"**/*.{js,ts,tsx}\" && black . --check",
+    "format": "ts-standard --fix \"**/*.{js,ts,tsx}\" && black .",
     "prepare": "husky"
   },
   "repository": {

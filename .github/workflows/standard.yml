@@ -21,4 +21,4 @@ jobs:
       - name: Install dependencies
         run: pnpm install
       - name: Run Standard Lint
-        run: pnpm run lint
+        run: pnpm exec ts-standard "**/*.{js,ts,tsx}"
