@@ -41,13 +41,12 @@ jobs:
         run: |
           COMMIT_HASH=$(git rev-parse --short HEAD)
           echo "COMMIT_HASH=$COMMIT_HASH" >> $GITHUB_ENV
-          mv out/*.zip "out/xone-driver-manager-${COMMIT_HASH}.zip"
           mkdir -p dist-out
           unzip out/*.zip -d dist-out/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
-          name: Xone Driver Manager-${{ env.COMMIT_HASH }}
+          name: xone-driver-manager-${{ env.COMMIT_HASH }}
           path: dist-out/
           if-no-files-found: error
