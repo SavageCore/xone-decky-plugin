@@ -3,6 +3,7 @@ import asyncio
 import subprocess
 import glob
 import json
+import hashlib
 import decky
 
 # Constants
@@ -117,8 +118,170 @@ class Plugin:
                 "xone_installed": False,
                 "xpad_installed": False,
                 "fully_installed": False,
+                "version": "0.0.0",
                 "error": str(e),
             }
+
+    def _calculate_hash(self, file_path: str) -> str:
+        """Calculate SHA256 hash of a file"""
+        sha256_hash = hashlib.sha256()
+        with open(file_path, "rb") as f:
+            # Read in 4KB chunks
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        return sha256_hash.hexdigest()
+
+    def _get_checksum_file(self) -> str:
+        """Get path to the checksums file"""
+        settings_dir = os.environ.get("DECKY_PLUGIN_SETTINGS_DIR", "/tmp")
+        return os.path.join(settings_dir, "checksums.json")
+
+    def _save_checksum(self, version: str, hash_val: str):
+        """Save checksum for a specific version"""
+        try:
+            checksum_file = self._get_checksum_file()
+            data = {}
+            if os.path.exists(checksum_file):
+                with open(checksum_file, "r") as f:
+                    data = json.load(f)
+
+            data[version] = hash_val
+            with open(checksum_file, "w") as f:
+                json.dump(data, f)
+        except Exception as e:
+            decky.logger.error(f"Error saving checksum: {e}")
+
+    def _verify_checksum(self, version: str, file_path: str) -> bool:
+        """Verify file checksum against saved value"""
+        try:
+            checksum_file = self._get_checksum_file()
+            if not os.path.exists(checksum_file):
+                return False
+
+            with open(checksum_file, "r") as f:
+                data = json.load(f)
+
+            saved_hash = data.get(version)
+            if not saved_hash:
+                return False
+
+            current_hash = self._calculate_hash(file_path)
+            return current_hash == saved_hash
+        except Exception as e:
+            decky.logger.error(f"Error verifying checksum: {e}")
+            return False
+
+    def parse_version(self, version_str: str):
+        """Parse version string into a comparison-ready tuple."""
+        import re
+
+        # Remove leading 'v' and split by dot
+        version_str = version_str.lstrip("v").split("-")[0]  # Ignore suffixes for now
+        parts = []
+        for p in re.split(r"(\d+)", version_str):
+            if p.isdigit():
+                parts.append(int(p))
+            elif p:
+                parts.append(p)
+        return tuple(parts)
+
+    async def check_for_updates(self) -> dict:
+        """Check for updates on GitHub"""
+        try:
+            # Read current version
+            status = await self.get_install_status()
+            current_version_str = status.get("version", "0.0.0")
+
+            # Fetch latest release from GitHub
+            # Use curl to avoid SSL issues and handle environment cleaning
+            url = "https://api.github.com/repos/SavageCore/xone-decky-plugin/releases/latest"
+            result = subprocess.run(
+                ["curl", "-s", "-H", "Accept: application/vnd.github.v3+json", url],
+                capture_output=True,
+                text=True,
+                env=get_clean_env(),
+            )
+
+            if result.returncode != 0:
+                return {"update_available": False, "error": "Failed to fetch update info"}
+
+            data = json.loads(result.stdout)
+            latest_version_str = data.get("tag_name", "0.0.0")
+
+            # Robust version comparison
+            update_available = self.parse_version(latest_version_str) > self.parse_version(
+                current_version_str
+            )
+
+            # Find the zip asset
+            download_url = None
+            filename = None
+            for asset in data.get("assets", []):
+                if asset.get("name", "").endswith(".zip"):
+                    download_url = asset.get("browser_download_url")
+                    filename = asset.get("name")
+                    break
+
+            # Check if file exists locally and matches hash
+            file_exists = False
+            if filename:
+                downloads_dir = "/home/deck/Downloads"
+                local_path = os.path.join(downloads_dir, filename)
+                if os.path.exists(local_path):
+                    file_exists = self._verify_checksum(latest_version_str, local_path)
+
+            return {
+                "update_available": update_available,
+                "latest_version": latest_version_str.lstrip("v"),
+                "latest_tag": latest_version_str,
+                "current_version": current_version_str.lstrip("v"),
+                "download_url": download_url,
+                "filename": filename,
+                "file_exists": file_exists,
+                "release_notes": data.get("body", ""),
+            }
+        except Exception as e:
+            decky.logger.error(f"Error checking for updates: {e}")
+            return {"update_available": False, "error": str(e)}
+
+    async def download_latest_release(self, url: str) -> dict:
+        """Download the latest release zip to Downloads folder"""
+        try:
+            if not url:
+                return {"success": False, "error": "No download URL provided"}
+
+            # Get latest version for checksumming
+            update_status = await self.check_for_updates()
+            latest_tag = update_status.get("latest_tag")
+
+            downloads_dir = "/home/deck/Downloads"
+            os.makedirs(downloads_dir, exist_ok=True)
+
+            filename = url.split("/")[-1]
+            dest_path = os.path.join(downloads_dir, filename)
+
+            decky.logger.info(f"Downloading update from {url} to {dest_path}")
+
+            # Use curl for download
+            result = subprocess.run(
+                ["curl", "-L", "-o", dest_path, url],
+                capture_output=True,
+                text=True,
+                env=get_clean_env(),
+            )
+
+            if result.returncode != 0:
+                return {"success": False, "error": result.stderr or "Download failed"}
+
+            # Calculate and save hash
+            if latest_tag:
+                file_hash = self._calculate_hash(dest_path)
+                self._save_checksum(latest_tag, file_hash)
+
+            return {"success": True, "path": dest_path}
+        except Exception as e:
+            decky.logger.error(f"Error downloading update: {e}")
+            return {"success": False, "error": str(e)}
 
     async def get_pairing_status(self) -> dict:
         """Check if dongle is in pairing mode"""
