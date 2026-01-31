@@ -25,18 +25,8 @@ xone is a modern replacement for xpad, aiming to be compatible with Microsoft's 
 
 ## Installation
 
-### From Decky Plugin Store (Recommended)
-
 > [!NOTE]
-> The store maintainers haven't reviewed the PR yet, so manual install is currently required. Please follow the [Manual Installation](#manual-installation) steps below.
-
-1. Open Quick Access Menu (⋯ button)
-2. Go to the Decky tab (plug icon)
-3. Open the Plugin Store
-4. Search for "Xone Driver Manager"
-5. Click Install
-
-### Manual Installation
+> The Decky store does not except plugins that disable read-only so you must install manually. See [the pr](https://github.com/SteamDeckHomebrew/decky-plugin-database/pull/968#pullrequestreview-3730477839) for more information.
 
 1. Download the `.zip` from the latest [releases](https://github.com/SavageCore/xone-decky-plugin/releases/latest) page
 2. Open the Decky settings and navigate to Developer menu
