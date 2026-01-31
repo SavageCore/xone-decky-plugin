@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rollup -c",
     "watch": "rollup -c -w",
-    "package": "node ../decky-plugin-builder/src/index.js ../decky-plugin-database/plugins/xone-decky-plugin --remote http://192.168.1.15:3000",
+    "package": "node ../decky-plugin-builder/src/index.js plugin build . --remote http://192.168.1.15:3000",
     "crop-screenshots": "node scripts/crop-screenshots.js",
     "version": "node scripts/sync-version.js",
     "lint": "ts-standard \"**/*.{js,ts,tsx}\"",
