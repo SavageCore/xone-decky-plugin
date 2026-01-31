@@ -10,7 +10,8 @@
     "crop-screenshots": "node scripts/crop-screenshots.js",
     "version": "node scripts/sync-version.js",
     "lint": "ts-standard \"**/*.{js,ts,tsx}\"",
-    "format": "ts-standard --fix \"**/*.{js,ts,tsx}\""
+    "format": "ts-standard --fix \"**/*.{js,ts,tsx}\"",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
@@ -39,6 +40,8 @@
     "@types/react-dom": "19.2.3",
     "@types/webpack": "^5.28.5",
     "archiver": "^7.0.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
     "rollup": "^4.57.0",
     "sharp": "^0.34.5",
     "ts-standard": "^12.0.2",
@@ -56,5 +59,9 @@
         "react-dom"
       ]
     }
+  },
+  "lint-staged": {
+    "**/*.{js,ts,tsx}": "ts-standard --fix",
+    "**/*.py": "black"
   }
 }
