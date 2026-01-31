@@ -35,7 +35,7 @@ jobs:
         run: decky plugin build .
 
       - name: Add version to zip name
-        run: mv out/Xone.Driver.Manager.zip out/xone-driver-manager-${{ github.ref_name }}.zip
+        run: mv out/*.zip out/xone-driver-manager-${{ github.ref_name }}.zip
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
