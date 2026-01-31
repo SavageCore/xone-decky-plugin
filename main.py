@@ -2,6 +2,7 @@ import os
 import asyncio
 import subprocess
 import glob
+import json
 import decky
 
 # Constants
@@ -93,10 +94,22 @@ class Plugin:
                 f"Install status: xone={xone_installed}, xpad={xpad_installed}"
             )
 
+            # Read version from plugin.json
+            plugin_dir = os.environ.get(
+                "DECKY_PLUGIN_DIR", os.path.dirname(os.path.abspath(__file__))
+            )
+            plugin_json_path = os.path.join(plugin_dir, "plugin.json")
+            version = "0.0.0"
+            if os.path.exists(plugin_json_path):
+                with open(plugin_json_path, "r") as f:
+                    plugin_json = json.load(f)
+                    version = plugin_json.get("version", "0.0.0")
+
             return {
                 "xone_installed": xone_installed,
                 "xpad_installed": xpad_installed,
                 "fully_installed": xone_installed and xpad_installed,
+                "version": version,
             }
         except Exception as e:
             decky.logger.error(f"Error checking install status: {e}")

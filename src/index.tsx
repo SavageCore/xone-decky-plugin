@@ -12,62 +12,64 @@ import { FaGamepad } from 'react-icons/fa'
 
 // Backend callable functions
 const getInstallStatus = callable<
-[],
-{
-  xone_installed: boolean
-  xpad_installed: boolean
-  fully_installed: boolean
-  error?: string
-}
+  [],
+  {
+    xone_installed: boolean
+    xpad_installed: boolean
+    fully_installed: boolean
+    version: string
+    error?: string
+  }
 >('get_install_status')
 
 const getPairingStatus = callable<
-[],
-{
-  available: boolean
-  pairing: boolean
-  error?: string
-}
+  [],
+  {
+    available: boolean
+    pairing: boolean
+    error?: string
+  }
 >('get_pairing_status')
 
 const installDrivers = callable<
-[],
-{
-  success: boolean
-  error?: string
-  output?: string
-  reboot_required?: boolean
-  message?: string
-}
+  [],
+  {
+    success: boolean
+    error?: string
+    output?: string
+    reboot_required?: boolean
+    message?: string
+  }
 >('install_drivers')
 
 const uninstallDrivers = callable<
-[],
-{
-  success: boolean
-  error?: string
-  output?: string
-}
+  [],
+  {
+    success: boolean
+    error?: string
+    output?: string
+  }
 >('uninstall_drivers')
 
 const enablePairing = callable<
-[],
-{
-  success: boolean
-  error?: string
-}
+  [],
+  {
+    success: boolean
+    error?: string
+  }
 >('enable_pairing')
 
 const disablePairing = callable<
-[],
-{
-  success: boolean
-  error?: string
-}
+  [],
+  {
+    success: boolean
+    error?: string
+  }
 >('disable_pairing')
 
-function Content (): React.ReactElement {
+function Content(): React.ReactElement {
   const [isInstalled, setIsInstalled] = useState<boolean>(false)
+  const [version, setVersion] = useState<string>('0.0.0')
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [isInstalling, setIsInstalling] = useState<boolean>(false)
   const [isUninstalling, setIsUninstalling] = useState<boolean>(false)
@@ -83,6 +85,7 @@ function Content (): React.ReactElement {
       try {
         const installStatus = await getInstallStatus()
         setIsInstalled(installStatus.fully_installed)
+        setVersion(installStatus.version)
 
         const pairingStatus = await getPairingStatus()
         setPairingAvailable(pairingStatus.available)
@@ -295,14 +298,14 @@ function Content (): React.ReactElement {
                 <Spinner style={{ width: '16px', height: '16px' }} />
                 Installing...
               </span>
-              )
+            )
             : isInstalled
               ? (
-                  'Reinstall Drivers'
-                )
+                'Reinstall Drivers'
+              )
               : (
-                  'Install Drivers'
-                )}
+                'Install Drivers'
+              )}
         </ButtonItem>
       </PanelSectionRow>
 
@@ -327,28 +330,28 @@ function Content (): React.ReactElement {
                   <Spinner style={{ width: '16px', height: '16px' }} />
                   Uninstalling...
                 </span>
-                )
+              )
               : (
-                  'Uninstall Drivers'
-                )}
+                'Uninstall Drivers'
+              )}
           </ButtonItem>
         </PanelSectionRow>
       )}
 
-      {/* Pairing Toggle - only show if dongle available */}
-      {pairingAvailable && (
-        <PanelSectionRow>
-          <ToggleField
-            label='Dongle Pairing Mode'
-            description={
-              isPairing ? 'Waiting for controller...' : 'Enable to pair a new controller'
-            }
-            checked={isPairing}
-            disabled={pairingLoading}
-            onChange={(enabled) => { void handlePairingToggle(enabled) }}
-          />
-        </PanelSectionRow>
-      )}
+      {/* Pairing Toggle - always show, disable if no dongle */}
+      <PanelSectionRow>
+        <ToggleField
+          label='Dongle Pairing Mode'
+          description={
+            !pairingAvailable
+              ? 'Dongle not detected'
+              : isPairing ? 'Waiting for controller...' : 'Enable to pair a new controller'
+          }
+          checked={isPairing}
+          disabled={pairingLoading || !pairingAvailable}
+          onChange={(enabled) => { void handlePairingToggle(enabled) }}
+        />
+      </PanelSectionRow>
 
       {/* Help text when not installed */}
       {!isInstalled && (
@@ -374,6 +377,21 @@ function Content (): React.ReactElement {
           </div>
         </PanelSectionRow>
       )}
+
+      {/* Version Display */}
+      <PanelSectionRow>
+        <div
+          style={{
+            textAlign: 'center',
+            fontSize: '10px',
+            color: '#888',
+            padding: '10px 0',
+            opacity: 0.6
+          }}
+        >
+          v{version}
+        </div>
+      </PanelSectionRow>
     </PanelSection>
   )
 }
@@ -399,7 +417,7 @@ export default definePlugin(() => {
     titleView: <div className={staticClasses.Title}>Xone Driver Manager</div>,
     content: <Content />,
     icon: <FaGamepad />,
-    onDismount () {
+    onDismount() {
       console.log('Xone Driver Manager plugin unloaded')
       removeEventListener('kernel_update_detected', kernelUpdateListener)
     }
