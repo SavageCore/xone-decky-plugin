@@ -6,7 +6,6 @@ import {
   ToggleField,
   staticClasses,
   Spinner,
-  Focusable,
   ModalRoot,
   showModal
 } from '@decky/ui'
@@ -15,85 +14,85 @@ import { FaGamepad } from 'react-icons/fa'
 
 // Backend callable functions
 const getInstallStatus = callable<
-  [],
-  {
-    xone_installed: boolean
-    xpad_installed: boolean
-    fully_installed: boolean
-    version: string
-    error?: string
-  }
+[],
+{
+  xone_installed: boolean
+  xpad_installed: boolean
+  fully_installed: boolean
+  version: string
+  error?: string
+}
 >('get_install_status')
 
 const getPairingStatus = callable<
-  [],
-  {
-    available: boolean
-    pairing: boolean
-    error?: string
-  }
+[],
+{
+  available: boolean
+  pairing: boolean
+  error?: string
+}
 >('get_pairing_status')
 
 const installDrivers = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-    output?: string
-    reboot_required?: boolean
-    message?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+  output?: string
+  reboot_required?: boolean
+  message?: string
+}
 >('install_drivers')
 
 const uninstallDrivers = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-    output?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+  output?: string
+}
 >('uninstall_drivers')
 
 const enablePairing = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+}
 >('enable_pairing')
 
 const disablePairing = callable<
-  [],
-  {
-    success: boolean
-    error?: string
-  }
+[],
+{
+  success: boolean
+  error?: string
+}
 >('disable_pairing')
 
 const checkForUpdates = callable<
-  [],
-  {
-    update_available: boolean
-    latest_version?: string
-    current_version?: string
-    download_url?: string
-    filename?: string
-    file_exists?: boolean
-    release_notes?: string
-    error?: string
-  }
+[],
+{
+  update_available: boolean
+  latest_version?: string
+  current_version?: string
+  download_url?: string
+  filename?: string
+  file_exists?: boolean
+  release_notes?: string
+  error?: string
+}
 >('check_for_updates')
 
 const downloadLatestRelease = callable<
-  [url: string],
-  {
-    success: boolean
-    path?: string
-    error?: string
-  }
+[url: string],
+{
+  success: boolean
+  path?: string
+  error?: string
+}
 >('download_latest_release')
 
-const UpdateModal: React.FC<{ filename: string; version: string; close: () => void }> = ({
+const UpdateModal: React.FC<{ filename: string, version: string, close: () => void }> = ({
   filename,
   version,
   close
@@ -111,7 +110,8 @@ const UpdateModal: React.FC<{ filename: string; version: string; close: () => vo
                 borderRadius: '4px',
                 color: '#5ba32b',
                 fontWeight: 'bold'
-              }}>
+              }}
+              >
                 {filename}
               </code>
             </div>
@@ -128,14 +128,14 @@ const UpdateModal: React.FC<{ filename: string; version: string; close: () => vo
           </div>
         </PanelSectionRow>
         <PanelSectionRow>
-          <ButtonItem onClick={close} layout="below">Close</ButtonItem>
+          <ButtonItem onClick={close} layout='below'>Close</ButtonItem>
         </PanelSectionRow>
       </PanelSection>
     </ModalRoot>
   )
 }
 
-function Content(): React.ReactElement {
+function Content (): React.ReactElement {
   const [isInstalled, setIsInstalled] = useState<boolean>(false)
   const [version, setVersion] = useState<string>('0.0.0')
   const [isLoading, setIsLoading] = useState<boolean>(true)
@@ -221,7 +221,7 @@ function Content(): React.ReactElement {
       } else if (result.reboot_required === true) {
         toaster.toast({ title: 'Xone Manager', body: 'Please reboot and reinstall drivers.', duration: 15000 })
       } else {
-        toaster.toast({ title: 'Xone Manager', body: result.error || 'Installation failed', duration: 8000 })
+        toaster.toast({ title: 'Xone Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Installation failed'), duration: 8000 })
       }
     } catch (e) {
       toaster.toast({ title: 'Xone Manager', body: String(e), duration: 8000 })
@@ -241,7 +241,7 @@ function Content(): React.ReactElement {
         setPairingAvailable(false)
         setIsPairing(false)
       } else {
-        toaster.toast({ title: 'Xone Manager', body: result.error || 'Uninstallation failed', duration: 8000 })
+        toaster.toast({ title: 'Xone Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Uninstallation failed'), duration: 8000 })
       }
     } catch (e) {
       toaster.toast({ title: 'Xone Manager', body: String(e), duration: 8000 })
@@ -264,7 +264,7 @@ function Content(): React.ReactElement {
           duration: 4000
         })
       } else {
-        toaster.toast({ title: 'Pairing Error', body: result.error || 'Failed to change mode', duration: 5000 })
+        toaster.toast({ title: 'Pairing Error', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Failed to change mode'), duration: 5000 })
       }
     } catch (e) {
       toaster.toast({ title: 'Pairing Error', body: String(e), duration: 5000 })
@@ -276,13 +276,13 @@ function Content(): React.ReactElement {
   }
 
   const handleDownloadUpdate = async (): Promise<void> => {
-    if (!updateInfo.url) return
+    if (updateInfo.url === undefined || updateInfo.url === null) return
     setIsDownloading(true)
     toaster.toast({ title: 'Xone Manager', body: 'Downloading to Downloads folder...', duration: 3000 })
     try {
       const result = await downloadLatestRelease(updateInfo.url)
       if (result.success) {
-        toaster.toast({ title: 'Xone Manager', body: `Saved to ${result.path}`, duration: 10000 })
+        toaster.toast({ title: 'Xone Manager', body: `Saved to ${result.path ?? ''}`, duration: 10000 })
         const update = await checkForUpdates()
         setUpdateInfo({
           available: true,
@@ -292,7 +292,7 @@ function Content(): React.ReactElement {
           fileExists: update.file_exists
         })
       } else {
-        toaster.toast({ title: 'Xone Manager', body: result.error || 'Download failed', duration: 5000 })
+        toaster.toast({ title: 'Xone Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Download failed'), duration: 5000 })
       }
     } catch (e) {
       toaster.toast({ title: 'Xone Manager', body: String(e), duration: 5000 })
@@ -301,12 +301,12 @@ function Content(): React.ReactElement {
     }
   }
 
-  const showUpdateInstructions = () => {
+  const showUpdateInstructions = (): void => {
     const modalRes = showModal(
       <UpdateModal
-        filename={updateInfo.filename || ''}
-        version={updateInfo.version || ''}
-        close={() => modalRes.Close()}
+        filename={updateInfo.filename ?? ''}
+        version={updateInfo.version ?? ''}
+        close={() => { modalRes.Close() }}
       />,
       window
     )
@@ -333,7 +333,8 @@ function Content(): React.ReactElement {
           backgroundColor: isInstalled ? '#5ba32b' : '#de9c28',
           borderRadius: '8px',
           textAlign: 'center'
-        }}>
+        }}
+        >
           <span style={{ fontWeight: 'bold', color: '#fff' }}>
             {isInstalled ? 'Drivers Installed' : 'Drivers Not Installed'}
           </span>
@@ -342,14 +343,14 @@ function Content(): React.ReactElement {
 
       {/* Driver Controls */}
       <PanelSectionRow>
-        <ButtonItem layout='below' onClick={handleInstall} disabled={isInstalling || isUninstalling}>
+        <ButtonItem layout='below' onClick={() => { void handleInstall() }} disabled={isInstalling || isUninstalling}>
           {isInstalling ? 'Installing...' : isInstalled ? 'Reinstall Drivers' : 'Install Drivers'}
         </ButtonItem>
       </PanelSectionRow>
 
       {isInstalled && (
         <PanelSectionRow>
-          <ButtonItem layout='below' onClick={handleUninstall} disabled={isInstalling || isUninstalling}>
+          <ButtonItem layout='below' onClick={() => { void handleUninstall() }} disabled={isInstalling || isUninstalling}>
             {isUninstalling ? 'Uninstalling...' : 'Uninstall Drivers'}
           </ButtonItem>
         </PanelSectionRow>
@@ -362,7 +363,7 @@ function Content(): React.ReactElement {
           description={!pairingAvailable ? 'Dongle not detected' : isPairing ? 'Waiting...' : 'Enable to pair'}
           checked={isPairing}
           disabled={pairingLoading || !pairingAvailable}
-          onChange={handlePairingToggle}
+          onChange={(checked) => { void handlePairingToggle(checked) }}
         />
       </PanelSectionRow>
 
@@ -375,21 +376,22 @@ function Content(): React.ReactElement {
             border: '1px solid #5ba32b',
             borderRadius: '8px',
             marginTop: '8px'
-          }}>
+          }}
+          >
             <div style={{ fontWeight: 'bold', color: '#5ba32b', marginBottom: '8px' }}>
-              Update Available (v{updateInfo.version})
+              Update Available (v{updateInfo.version ?? ''})
             </div>
-            {updateInfo.fileExists
+            {updateInfo.fileExists === true
               ? (
                 <ButtonItem layout='below' onClick={showUpdateInstructions}>
                   Install Instructions
                 </ButtonItem>
-              )
+                )
               : (
-                <ButtonItem layout='below' onClick={handleDownloadUpdate} disabled={isDownloading}>
+                <ButtonItem layout='below' onClick={() => { void handleDownloadUpdate() }} disabled={isDownloading}>
                   {isDownloading ? 'Downloading...' : 'Download Update'}
                 </ButtonItem>
-              )}
+                )}
           </div>
         </PanelSectionRow>
       )}
@@ -415,7 +417,7 @@ export default definePlugin(() => {
     titleView: <div className={staticClasses.Title}>Xone Driver Manager</div>,
     content: <Content />,
     icon: <FaGamepad />,
-    onDismount() {
+    onDismount () {
       removeEventListener('kernel_update_detected', kernelUpdateListener)
     }
   }
