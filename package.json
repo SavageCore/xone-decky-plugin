@@ -36,7 +36,7 @@
     "@decky/ui": "^4.11.1",
     "@rollup/rollup-linux-x64-musl": "^4.57.0",
     "@types/archiver": "^7.0.0",
-    "@types/react": "19.2.10",
+    "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "@types/webpack": "^5.28.5",
     "archiver": "^7.0.1",
