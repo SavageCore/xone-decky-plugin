@@ -38,7 +38,7 @@ jobs:
         run: mv out/*.zip out/xone-driver-manager-${{ github.ref_name }}.zip
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: out/*.zip
           generate_release_notes: true
