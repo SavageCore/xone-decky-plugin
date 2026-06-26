@@ -239,14 +239,13 @@ install_xone() {
     cd "$XONE_LOCAL_REPO"
     
     # Run the install script and capture output to check for errors
-    local install_output
-    install_output=$(./install.sh --release 2>&1) || true
-    local install_exit_code=$?
-    
+    local install_output install_exit_code=0
+    install_output=$(./install.sh --release 2>&1) || install_exit_code=$?
+
     # Check for kernel header mismatch error
     if echo "$install_output" | grep -q "Your kernel headers for kernel .* cannot be found"; then
-        check_kernel_header_mismatch "$install_output"
-        local mismatch_result=$?
+        local mismatch_result=0
+        check_kernel_header_mismatch "$install_output" || mismatch_result=$?
         if [ $mismatch_result -eq 0 ]; then
             echo "REBOOT_REQUIRED"
             return 100  # Special code for reboot needed
@@ -281,14 +280,13 @@ install_xpad_noone() {
     cp -r "$XPAD_NOONE_LOCAL_REPO" "/usr/src/xpad-noone-$XPAD_NOONE_VERSION"
     
     # Run dkms install and capture output to check for errors
-    local dkms_output
-    dkms_output=$(dkms install -m xpad-noone -v "$XPAD_NOONE_VERSION" 2>&1) || true
-    local dkms_exit_code=$?
-    
+    local dkms_output dkms_exit_code=0
+    dkms_output=$(dkms install -m xpad-noone -v "$XPAD_NOONE_VERSION" 2>&1) || dkms_exit_code=$?
+
     # Check for kernel header mismatch error
     if echo "$dkms_output" | grep -q "Your kernel headers for kernel .* cannot be found"; then
-        check_kernel_header_mismatch "$dkms_output"
-        local mismatch_result=$?
+        local mismatch_result=0
+        check_kernel_header_mismatch "$dkms_output" || mismatch_result=$?
         if [ $mismatch_result -eq 0 ]; then
             echo "REBOOT_REQUIRED"
             return 100  # Special code for reboot needed

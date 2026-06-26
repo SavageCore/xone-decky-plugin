@@ -183,7 +183,7 @@ function Content (): React.ReactElement {
         setPairingAvailable(pairingStatus.available)
         setIsPairing(pairingStatus.pairing)
       } else if (result.reboot_required === true) {
-        toaster.toast({ title: 'Xone Driver Manager', body: 'Please reboot and reinstall drivers.', duration: 15000 })
+        toaster.toast({ title: 'Xone Driver Manager', body: 'Kernel upgraded! Reboot, then click Install to finish.', duration: 15000 })
       } else {
         toaster.toast({ title: 'Xone Driver Manager', body: (((result.error ?? '') !== '') ? (result.error ?? '') : 'Installation failed'), duration: 8000 })
       }

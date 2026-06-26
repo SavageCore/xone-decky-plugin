@@ -508,7 +508,7 @@ class Plugin:
                 decky.logger.error(f"Install failed: {result.stderr}")
                 return {
                     "success": False,
-                    "error": result.stderr or "Installation failed",
+                    "error": result.stderr or result.stdout or "Installation failed",
                     "output": result.stdout,
                 }
 
