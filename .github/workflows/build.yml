@@ -45,7 +45,7 @@ jobs:
           unzip out/*.zip -d dist-out/
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: xone-driver-manager-${{ env.COMMIT_HASH }}
           path: dist-out/
