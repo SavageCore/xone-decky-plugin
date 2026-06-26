@@ -1,2 +1,8 @@
+packages:
+  - '.'
 allowBuilds:
   sharp: true
+peerDependencyRules:
+  ignoreMissing:
+    - react
+    - react-dom
