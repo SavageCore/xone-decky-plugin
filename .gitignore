@@ -6,3 +6,5 @@ raw-screenshots/
 .DS_Store
 Thumbs.db
 __pycache__/
+.env
+deck.json

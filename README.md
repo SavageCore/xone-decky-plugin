@@ -41,11 +41,13 @@ Starting with version 0.3.0, the plugin includes a built-in auto-update system. 
 
 ### Building from Source
 
+Building requires the [Decky CLI](https://github.com/SteamDeckHomebrew/cli) and Docker (or Podman).
+
 1. Clone the repository
 2. Run `pnpm install` to install dependencies
-3. Run `pnpm run package` to build and package the plugin
-4. Transfer the `.zip` file in the `out/` directory to your Steam Deck
-5. Follow the manual installation steps above
+3. Run `pnpm setup:decky` once to install the Decky CLI
+4. Run `pnpm package` to build and package the plugin - the `.zip` is written to `out/`
+5. Transfer the `.zip` file to your Steam Deck and follow the manual installation steps above, or copy `.env.example` to `.env`, fill in your Deck's IP, SSH key and deck user password (needed for the remote `sudo` steps even though SSH login uses a key), and run `pnpm deploy` to build and push it directly
 
 ## Usage
 
