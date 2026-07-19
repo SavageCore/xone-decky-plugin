@@ -68,6 +68,25 @@ class Plugin:
 
     async def get_install_status(self) -> dict:
         """Check if xone and xpad-noone drivers are installed"""
+        # Read version from plugin.json first - this is unrelated to dkms/driver
+        # state and must stay correct even if dkms is missing (e.g. wiped by a
+        # SteamOS update), otherwise check_for_updates() sees a fake "0.0.0" and
+        # shows a false "Update Available" banner tied to driver status.
+        plugin_dir = os.environ.get(
+            "DECKY_PLUGIN_DIR", os.path.dirname(os.path.abspath(__file__))
+        )
+        version = "0.0.0"
+        try:
+            plugin_json_path = os.path.join(plugin_dir, "plugin.json")
+            if os.path.exists(plugin_json_path):
+                with open(plugin_json_path, "r") as f:
+                    version = json.load(f).get("version", "0.0.0")
+        except Exception as e:
+            decky.logger.error(f"Error reading plugin version: {e}")
+
+        xone_installed = False
+        xpad_installed = False
+        error = None
         try:
             env = get_clean_env()
 
@@ -96,33 +115,22 @@ class Plugin:
             decky.logger.info(
                 f"Install status: xone={xone_installed}, xpad={xpad_installed}"
             )
-
-            # Read version from plugin.json
-            plugin_dir = os.environ.get(
-                "DECKY_PLUGIN_DIR", os.path.dirname(os.path.abspath(__file__))
-            )
-            plugin_json_path = os.path.join(plugin_dir, "plugin.json")
-            version = "0.0.0"
-            if os.path.exists(plugin_json_path):
-                with open(plugin_json_path, "r") as f:
-                    plugin_json = json.load(f)
-                    version = plugin_json.get("version", "0.0.0")
-
-            return {
-                "xone_installed": xone_installed,
-                "xpad_installed": xpad_installed,
-                "fully_installed": xone_installed and xpad_installed,
-                "version": version,
-            }
         except Exception as e:
-            decky.logger.error(f"Error checking install status: {e}")
-            return {
-                "xone_installed": False,
-                "xpad_installed": False,
-                "fully_installed": False,
-                "version": "0.0.0",
-                "error": str(e),
-            }
+            # dkms missing (e.g. SteamOS update wiped the rootfs) means the
+            # drivers aren't installed - that's a legitimate, expected state,
+            # not a reason to fall back to a fake version.
+            decky.logger.error(f"Error checking dkms status: {e}")
+            error = str(e)
+
+        result = {
+            "xone_installed": xone_installed,
+            "xpad_installed": xpad_installed,
+            "fully_installed": xone_installed and xpad_installed,
+            "version": version,
+        }
+        if error:
+            result["error"] = error
+        return result
 
     def _calculate_hash(self, file_path: str) -> str:
         """Calculate SHA256 hash of a file"""
