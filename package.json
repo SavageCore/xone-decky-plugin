@@ -8,7 +8,7 @@
     "watch": "rollup -c -w",
     "package": "decky plugin build .",
     "setup:decky": "curl -L -o ~/.local/bin/decky https://github.com/SteamDeckHomebrew/cli/releases/latest/download/decky-linux-x86_64 && chmod +x ~/.local/bin/decky",
-    "deploy": "set -a && . ./.env && set +a && decky plugin deploy . -i \"$DECK_IP\" -p \"$DECK_PORT\" -x \"$DECK_PASS\" -k \"$DECK_KEY\" -c \"$DECK_DIR\"",
+    "deploy": "bash scripts/deploy.sh",
     "crop-screenshots": "node scripts/crop-screenshots.js",
     "version": "node scripts/sync-version.js",
     "lint": "ts-standard \"**/*.{js,ts,tsx}\" && black . --check",

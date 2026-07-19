@@ -1,0 +1,29 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Install Decky CLI",
+            "type": "shell",
+            "group": "none",
+            "detail": "One-time install of the decky CLI binary",
+            "command": "pnpm run setup:decky",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build",
+            "type": "shell",
+            "group": "build",
+            "detail": "Build and package the plugin into out/",
+            "command": "pnpm run package",
+            "problemMatcher": []
+        },
+        {
+            "label": "Deploy",
+            "type": "shell",
+            "group": "none",
+            "detail": "Build and push the plugin to the Steam Deck configured in .env",
+            "command": "pnpm run deploy",
+            "problemMatcher": []
+        }
+    ]
+}

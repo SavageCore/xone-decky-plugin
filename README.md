@@ -49,6 +49,11 @@ Building requires the [Decky CLI](https://github.com/SteamDeckHomebrew/cli) and 
 4. Run `pnpm package` to build and package the plugin - the `.zip` is written to `out/`
 5. Transfer the `.zip` file to your Steam Deck and follow the manual installation steps above, or copy `.env.example` to `.env`, fill in your Deck's IP, SSH key and deck user password (needed for the remote `sudo` steps even though SSH login uses a key), and run `pnpm deploy` to build and push it directly
 
+> [!NOTE]
+> Because this plugin requests the `root` flag, Decky Loader re-chowns its install directory back to `root` whenever the plugin reloads (a security measure so an unprivileged user can't tamper with code that runs as root) - including via its live-reload file watcher, which can race an unprivileged copy. `pnpm deploy` (`scripts/deploy.sh`) sidesteps this by uploading the zip as `deck` and extracting it as `root` on the Deck directly, the same approach the official [decky-plugin-template](https://github.com/SteamDeckHomebrew/decky-plugin-template)'s VS Code tasks use, rather than using `decky plugin deploy`'s built-in unprivileged rsync.
+
+VS Code tasks (`.vscode/tasks.json`) are also provided for the above via **Terminal → Run Task**.
+
 ## Usage
 
 1. Open Quick Access Menu (⋯ button)
