@@ -26,6 +26,14 @@ log_error() {
     echo "[ERROR] $1" >&2
 }
 
+# Get the package providing the currently running kernel (not just the latest
+# installed linux-neptune-N - SteamOS preview/beta kernels like -drm-exec are
+# excluded by that pattern, which pointed installs at the wrong headers package)
+running_kernel_pkg() {
+    cat "/usr/lib/modules/$(uname -r)/pkgbase" 2>/dev/null ||
+        pacman -Qsq linux-neptune 2>/dev/null | grep -E "^linux-neptune-[0-9]+$" | tail -n 1
+}
+
 # Check for kernel header mismatch and attempt auto-fix
 # Returns: 0 if fixed (reboot needed), 1 if no mismatch, 2 if fix failed
 check_kernel_header_mismatch() {
@@ -37,13 +45,22 @@ check_kernel_header_mismatch() {
         log_info "Your running kernel does not match the installed kernel headers."
         log_info "This is a known issue on SteamOS after system updates."
         
-        # Get the linux-neptune package name
+        # Get the package providing the currently running kernel
         local linux_pkg
-        linux_pkg=$(pacman -Qsq linux-neptune 2>/dev/null | grep -E "^linux-neptune-[0-9]+$" | tail -n 1 || echo "")
-        
+        linux_pkg=$(running_kernel_pkg)
+
         if [ -n "$linux_pkg" ]; then
+            # If the running kernel's own package has no update available,
+            # reinstalling and rebooting changes nothing - that's the loop
+            # issue #1 reporters hit. Fail without rebooting instead.
+            if ! pacman -Qu "$linux_pkg" >/dev/null 2>&1; then
+                log_error "No update available for $linux_pkg; a reboot will not fix this."
+                echo "KERNEL_HEADERS_UNAVAILABLE"
+                return 2
+            fi
+
             log_info "Attempting to upgrade kernel package: $linux_pkg"
-            
+
             if pacman -S "$linux_pkg" --noconfirm >/dev/null 2>&1; then
                 log_info "Kernel package upgraded successfully!"
                 echo "KERNEL_UPGRADED"
@@ -104,24 +121,32 @@ install_linux_headers() {
     log_info "Checking for linux headers..."
     
     local linux_pkg
-    linux_pkg=$(pacman -Qsq linux-neptune 2>/dev/null | grep -E "^linux-neptune-[0-9]+$" | tail -n 1 || echo "")
-    
+    linux_pkg=$(running_kernel_pkg)
+
     if [ -z "$linux_pkg" ]; then
         log_error "Could not determine linux-neptune package"
         return 1
     fi
-    
+
     local kernel_headers="${linux_pkg}-headers"
     log_info "Using kernel headers package: $kernel_headers"
-    
+
     # Check if already installed and up to date
     if pacman -Qs "$kernel_headers" >/dev/null 2>&1 && ! pacman -Qu "$kernel_headers" >/dev/null 2>&1; then
         log_info "Kernel headers already installed and up to date"
         return 0
     fi
-    
+
     log_info "Installing kernel headers..."
     pacman -Sy "$kernel_headers" --noconfirm >/dev/null
+
+    # A reboot can't fix a headers package that doesn't exist for this kernel
+    # (e.g. a SteamOS preview/beta kernel with no matching -headers package yet).
+    # Fail fast here instead of letting DKMS fail and loop on the reboot workaround.
+    if [ ! -d "/usr/lib/modules/$(uname -r)/build" ]; then
+        log_error "No headers package available for running kernel $(uname -r)"
+        return 1
+    fi
 }
 
 # Install required packages
