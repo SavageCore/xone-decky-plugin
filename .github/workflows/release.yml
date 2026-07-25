@@ -42,6 +42,8 @@ jobs:
         with:
           files: out/*.zip
           generate_release_notes: true
+          body: |
+            See [CHANGELOG.md](https://github.com/SavageCore/xone-decky-plugin/blob/main/CHANGELOG.md) for full release history.
           draft: false
           prerelease: ${{ contains(github.ref_name, '-') }}
 
